@@ -9,7 +9,7 @@ import java.io.IOException;
 /**
  * @author Ben
  * Created: 2/10/2011
- * Last Edit: 2/10/2011
+ * Last Edit: 2/15/2011
  */
 public class Loader {
 	
@@ -17,11 +17,12 @@ public class Loader {
 	String line; // input from buffer
 	int[] jobData; // parsed from input
 	String[] tokens; // used for non-instructions
-	int x;
+	int x, y; // index values: x for disk, y for PCB
 	public Loader()
 	{
 		jobData = new int[3];
 		x = 0;
+		y = 0;
 	}
 	
 	/**
@@ -30,7 +31,7 @@ public class Loader {
 	 * @param text -- name of data file
 	 * @throws IOException
 	 */
-	public void runLoad(char[][] arr, String text) throws IOException
+	public void runLoad(char[][] arr, String text, PCB[] pArr) throws IOException
 	{
 		inputStream = new BufferedReader(new FileReader(text));
 		while ((line = inputStream.readLine()) != null)
@@ -39,22 +40,35 @@ public class Loader {
 			{
 				for (int i=0; i<8; i++)
 					arr[x][i] = line.charAt(i+2); // ignores "0x"
-				System.out.print(arr[x++]);
+				//System.out.print(arr[x++]);
+				x++;
 			}
 			else
 			{
 				tokens = line.split(" ");
-				if (tokens[1].equals("JOB") || (tokens[1].equals("Data"))) // if JOB, pulls out job data
+				if (tokens[1].equals("JOB")) // if JOB, pulls out job data
 				{
 					for (int i=0; i<3; i++)
 					{
-						// TODO move data to PCB 
 						jobData[i] = Integer.parseInt(tokens[i+2],16);
-						System.out.print(jobData[i] + " ");
 					}
+					pArr[y].beginIndex = x;
+					pArr[y].jobID = jobData[0];
+					pArr[y].codeSize = jobData[1];
+					pArr[y].priority = jobData[2];
 				}
+				else if (tokens[1].equals("Data"))
+				{
+					for (int i=0; i<3; i++)
+					{
+						jobData[i] = Integer.parseInt(tokens[i+2],16);
+					}
+					pArr[y].inputBuffer = jobData[0];
+					pArr[y].outputBuffer = jobData[1];
+					pArr[y].tempBuffer = jobData[2];
+				}
+				else System.out.println(pArr[y++]);
 			}
-			System.out.println();
 		}
 	}
 	
