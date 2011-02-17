@@ -12,13 +12,15 @@ public class Scheduler {
 	 * I made this just so I can use it in OSDriver
 	 */
 	MemoryManager mgr;
-	int jobSize, jobBegin;
+	int jobSize, jobBegin, buffer[], i;
 	
 	public Scheduler(MemoryManager mgr)
 	{
 		this.mgr = mgr;
 		jobSize = -1;
 		jobBegin = -1;
+		buffer = new int[3];
+		i = -1;
 	}
 	
 	/**
@@ -36,16 +38,23 @@ public class Scheduler {
 		}
 		else
 		{
+			buffer[0] = p.inputBuffer;
+			buffer[1] = p.outputBuffer;
+			buffer[2] = p.tempBuffer;
 			p.base_Register = 0; // modify for m-scheduler later
 			comp.jobID = jobId;
-			for (int i=0; i<jobSize; i++)
+			for (i=0; i<jobSize; i++)
 			{
 				mgr.WriteInstruction(i,disk[jobBegin+i]);
 			}
-			for (int i=0; i<jobSize; i++)
+			for (i=0; i<3; i++)
+			{
+				
+			}
+			/*for (i=0; i<jobSize; i++)
 			{
 				comp.cache[i] = mgr.ReadInstruction(i);
-			}
+			}*/
 		}
 	}
 	

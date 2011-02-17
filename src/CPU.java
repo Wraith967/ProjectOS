@@ -14,17 +14,21 @@ public class CPU {
 	
 	char[][] cache;
 	int PC;
-	int jobID;
+	int jobID, jobSize;
 	char[][] registerBank;
 	Decode dec;
 	Execute exe;
 	char[] inst;
+	char[] inputBuffer;
+	char[] outputBuffer;
+	char[] tempBuffer;
 	
 	public CPU()
 	{
 		cache = new char[72][8];
-		PC=-1;
-		jobID=-1;
+		PC = -1;
+		jobID = -1;
+		jobSize = -1;
 		registerBank = new char[16][8];
 		dec = new Decode();
 		exe = new Execute();

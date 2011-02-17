@@ -23,6 +23,7 @@ public class Dispatcher {
 		comp.PC = 0;
 		comp.registerBank[0] = zeroInitializer;
 		comp.registerBank[1] = zeroInitializer;
+		comp.jobSize = p.codeSize;
 		// TODO Load remaining data from PCB to CPU
 	}
 	
