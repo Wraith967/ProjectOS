@@ -16,6 +16,9 @@ public class CPU {
 	int PC;
 	int jobID;
 	char[][] registerBank;
+	Decode dec;
+	Execute exe;
+	char[] inst;
 	
 	public CPU()
 	{
@@ -23,8 +26,21 @@ public class CPU {
 		PC=-1;
 		jobID=-1;
 		registerBank = new char[16][8];
+		dec = new Decode();
+		exe = new Execute();
+		inst = new char[8];
 	}
 	
+	public void runJob()
+	{
+		Fetch();
+		//Run dec
+		//Run exe
+	}
 	
+	public void Fetch()
+	{
+		inst = cache[PC++];
+	}
 	
 }

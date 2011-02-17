@@ -38,6 +38,7 @@ public class OSDriver {
 		{
 			sched.LoadJob(i, comp, PCBarr[i], disk);
 			disp.LoadData(i, comp, PCBarr[i]);
+			comp.runJob();
 		}
 		
 		
