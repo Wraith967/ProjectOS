@@ -45,7 +45,7 @@ public class Loader {
 			}
 			else
 			{
-				tokens = line.split(" ");
+				tokens = line.split(" "); // Modify for regex, maybe
 				if (tokens[1].equals("JOB")) // if JOB, pulls out job data
 				{
 					for (int i=0; i<3; i++)

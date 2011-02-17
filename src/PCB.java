@@ -16,6 +16,7 @@ public class PCB {
 	int outputBuffer;
 	int tempBuffer;
 	int beginIndex;
+	int base_Register;
 	
 	// TODO Add remaining PCB attributes
 	
