@@ -27,13 +27,18 @@ public class OSDriver {
 		
 		//Modules
 		Loader control = new Loader(); // handles reading in and parsing of all instructions
-		Scheduler sched = new Scheduler(); // determines Ready Queue
 		CPU comp = new CPU(); // handles processing
-		Dispatcher disp = new Dispatcher(); // moves jobs from RQ to CPU
 		MemoryManager mgr = new MemoryManager(); // handles RAM
+		Scheduler sched = new Scheduler(mgr); // moves job to CPU
+		Dispatcher disp = new Dispatcher(); // moves job data to CPU
 		
 		//Method Calls
 		control.runLoad(disk, "DataFile2.txt", PCBarr); // reads in datafile
+		for (int i=0; i<30; i++)
+		{
+			sched.LoadJob(i, comp, PCBarr[i], disk);
+			disp.LoadData(i, comp, PCBarr[i]);
+		}
 		
 		
 		// TODO Add remaining driver code
