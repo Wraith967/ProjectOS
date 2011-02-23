@@ -5,14 +5,14 @@
 /**
  * @author Ben
  * Created: 2/10/2011
- * Last Edit: 2/17/2011
+ * Last Edit: 2/23/2011
  */
 public class Scheduler {
 	/** TODO Create this class
 	 * I made this just so I can use it in OSDriver
 	 */
 	MemoryManager mgr;
-	int jobSize, jobBegin, buffer[], i;
+	int jobSize, jobBegin, buffer[], i, totalBuffer;
 	
 	public Scheduler(MemoryManager mgr)
 	{
@@ -41,15 +41,17 @@ public class Scheduler {
 			buffer[0] = p.inputBuffer;
 			buffer[1] = p.outputBuffer;
 			buffer[2] = p.tempBuffer;
+			totalBuffer = buffer[0]+buffer[1]+buffer[2];
 			p.base_Register = 0; // modify for m-scheduler later
+			p.cpuID = comp.cpuID;
 			comp.jobID = jobId;
 			for (i=0; i<jobSize; i++)
 			{
 				mgr.WriteInstruction(i,disk[jobBegin+i]);
 			}
-			for (i=0; i<3; i++)
+			for (i=0; i<totalBuffer; i++)
 			{
-				
+				mgr.WriteInstruction(jobSize+i, disk[jobBegin+jobSize+i]);
 			}
 			/*for (i=0; i<jobSize; i++)
 			{

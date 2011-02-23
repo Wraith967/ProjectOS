@@ -5,27 +5,30 @@
 /**
  * @author Ben
  * Created: 2/10/2011
- * Last Edit: 2/17/2011
+ * Last Edit: 2/23/2011
  */
 public class CPU {
 	/** TODO Create this class
 	 * I made this just so I can use it in OSDriver
 	 */
 	
-	char[][] cache;
-	int PC;
-	int jobID, jobSize;
-	char[][] registerBank;
-	Decode dec;
-	Execute exe;
-	char[] inst;
-	char[] inputBuffer;
-	char[] outputBuffer;
-	char[] tempBuffer;
+	char[][] cache; // Interior CPU cache
+	int PC; // Program counter
+	int jobID, jobSize; // ID and code length for jobs
+	static int cpuNum; // Total number of CPUs created
+	int cpuID; // Unique ID for each CPU
+	char[][] registerBank; // holds all registers for CPU
+	Decode dec; // decodes instructions
+	Execute exe; // performs instructions
+	char[] inst; // array for each instruction
+	char[][] inputBuffer; // holds values of job input buffers
+	char[][] outputBuffer; // holds values of job output buffers
+	char[][] tempBuffer; // holds values of job temporary buffers
+	MemoryManager mgr;
 	
-	public CPU()
+	public CPU(MemoryManager mgr)
 	{
-		cache = new char[72][8];
+		cache = new char[28][8]; // 28 is maximum instruction length 
 		PC = -1;
 		jobID = -1;
 		jobSize = -1;
@@ -33,18 +36,24 @@ public class CPU {
 		dec = new Decode();
 		exe = new Execute();
 		inst = new char[8];
+		this.mgr = mgr;
+		cpuID = cpuNum++;
 	}
 	
 	public void runJob()
 	{
-		Fetch();
-		//Run dec
-		//Run exe
+		while (PC <= jobSize)
+		{
+			Fetch();
+			//Run dec
+			//Run exe
+		}
 	}
 	
 	public void Fetch()
 	{
-		inst = cache[PC++];
+		inst = mgr.ReadInstruction(PC++);
+		//System.out.println(inst);
 	}
 	
 }

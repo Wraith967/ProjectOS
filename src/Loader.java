@@ -9,7 +9,7 @@ import java.io.IOException;
 /**
  * @author Ben
  * Created: 2/10/2011
- * Last Edit: 2/17/2011
+ * Last Edit: 2/23/2011
  */
 public class Loader {
 	
@@ -68,6 +68,7 @@ public class Loader {
 					pArr[y].tempBuffer = jobData[2];
 				}
 				else System.out.println(pArr[y++]);
+					//y++;
 			}
 		}
 	}

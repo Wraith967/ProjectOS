@@ -9,7 +9,7 @@
  */
 public class MemoryManager {
 
-	char[][] memory; // subset of instructions on "RAM"
+	private char[][] memory; // subset of instructions on "RAM"
 	
 	public MemoryManager()
 	{
