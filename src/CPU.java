@@ -5,7 +5,7 @@
 /**
  * @author Ben
  * Created: 2/10/2011
- * Last Edit: 2/23/2011
+ * Last Edit: 2/28/2011
  */
 public class CPU {
 	/** TODO Create this class
@@ -25,6 +25,7 @@ public class CPU {
 	char[][] outputBuffer; // holds values of job output buffers
 	char[][] tempBuffer; // holds values of job temporary buffers
 	MemoryManager mgr;
+	String decodeInst;
 	
 	public CPU(MemoryManager mgr)
 	{
@@ -34,19 +35,20 @@ public class CPU {
 		jobSize = -1;
 		registerBank = new char[16][8];
 		dec = new Decode();
-		exe = new Execute();
+		exe = new Execute(this);
 		inst = new char[8];
 		this.mgr = mgr;
 		cpuID = cpuNum++;
+		decodeInst = null;
 	}
 	
 	public void runJob()
 	{
-		while (PC <= jobSize)
+		while (PC < jobSize)
 		{
 			Fetch();
-			//Run dec
-			//Run exe
+			decodeInst = dec.DecodeInst(inst[0], inst[1]);
+			exe.ExecInst(decodeInst, inst);
 		}
 	}
 	

@@ -42,14 +42,14 @@ public class OSDriver {
 			disp.LoadData(i, comp, PCBarr[i]);
 			comp.runJob();
 		}
-		for (int i=0; i<30; i++)
+		/*for (int i=0; i<30; i++)
 		{
 			avgWaitTime += PCBarr[i].waitTime;
 			avgRunTime += PCBarr[i].runTime;
 		}
 		avgWaitTime /= 30;
 		avgRunTime /= 30;
-		
+		*/
 		
 		// TODO Add remaining driver code
 		
