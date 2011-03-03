@@ -17,13 +17,13 @@ public class CPU {
 	int jobID, jobSize; // ID and code length for jobs
 	static int cpuNum; // Total number of CPUs created
 	int cpuID; // Unique ID for each CPU
-	char[][] registerBank; // holds all registers for CPU
+	int[] registerBank; // holds all registers for CPU
 	Decode dec; // decodes instructions
 	Execute exe; // performs instructions
 	char[] inst; // array for each instruction
-	char[][] inputBuffer; // holds values of job input buffers
-	char[][] outputBuffer; // holds values of job output buffers
-	char[][] tempBuffer; // holds values of job temporary buffers
+	int[] inputBuffer; // holds values of job input buffers
+	int[] outputBuffer; // holds values of job output buffers
+	int[] tempBuffer; // holds values of job temporary buffers
 	MemoryManager mgr;
 	int[] decodeInst;
 	
@@ -33,9 +33,9 @@ public class CPU {
 		PC = -1;
 		jobID = -1;
 		jobSize = -1;
-		registerBank = new char[16][8];
+		registerBank = new int[16];
 		dec = new Decode();
-		exe = new Execute(this);
+		exe = new Execute(this, mgr);
 		inst = new char[8];
 		this.mgr = mgr;
 		cpuID = cpuNum++;

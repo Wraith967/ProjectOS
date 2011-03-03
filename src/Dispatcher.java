@@ -11,7 +11,7 @@ public class Dispatcher {
 	/** TODO Create this class
 	 * I made this just so I can use it in OSDriver
 	 */
-	char[] zeroInitializer = {'0','0','0','0','0','0','0','0'};
+	
 
 	public Dispatcher()
 	{
@@ -21,8 +21,8 @@ public class Dispatcher {
 	public void LoadData(int jobID, CPU comp, PCB p)
 	{
 		comp.PC = 0;
-		comp.registerBank[0] = zeroInitializer;
-		comp.registerBank[1] = zeroInitializer;
+		for (int i=0; i<16; i++)
+			comp.registerBank[i]=0;
 		comp.jobSize = p.codeSize;
 		// TODO Load remaining data from PCB to CPU
 	}

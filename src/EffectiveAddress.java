@@ -14,9 +14,14 @@ public class EffectiveAddress {
 		
 	}
 	
-	public int Address(int address, int direct, char[] base_register, char[] index_register)
+	public int DirectAddress(int offset, int base)
 	{
-		return 0;
+		return base+offset;
+	}
+	
+	public int IndirectAddress(int offset, int base, int index)
+	{
+			return base+index+offset;
 	}
 	
 }
