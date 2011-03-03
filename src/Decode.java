@@ -9,120 +9,89 @@
  */
 public class Decode {
 
-	String inst;
+	int[] decInst;
+	int[] converted;
 	public Decode()
 	{
-		inst = null;
+		decInst = new int[5];
+		converted = new int[8];
 	}
 	
-	public String DecodeInst(char a, char b)
+	public int[] DecodeInst(char[] a)
 	{
-		switch (a)
+		for (int i=0; i<8; i++)
+			converted[i]=convertHextoInt(a[i]);
+		if ((converted[0]==0)||(converted[0]==1))
+		{
+			decInst[0]=0;
+			decInst[1]=converted[0]*16+converted[1];
+			decInst[2]=converted[2];
+			decInst[3]=converted[3];
+			decInst[4]=converted[4];
+		}
+		else if ((converted[0]==4)||(converted[0]==5))
+		{
+			decInst[0]=1;
+			decInst[1]=(converted[0]%4)*16+converted[1];
+			decInst[2]=converted[2];
+			decInst[3]=converted[3];
+			decInst[4]=converted[4]*4096+converted[5]*256+converted[6]*16+converted[7];
+		}
+		else if (converted[0]==9)
+		{
+			decInst[0]=2;
+			decInst[1]=(converted[0]%8)*16+converted[1];
+			decInst[2]=converted[2]*1048576+converted[3]*65536+converted[4]*4096+converted[5]*256+converted[6]*16+converted[7];
+		}
+		else
+		{
+			decInst[0]=3;
+			decInst[1]=(converted[0]%12)+converted[1];
+			decInst[2]=converted[2];
+			decInst[3]=converted[3];
+			decInst[4]=converted[4]*4096+converted[5]*256+converted[6]*16+converted[7];
+		}
+		return decInst;
+	}
+	
+	private int convertHextoInt(char c)
+	{
+		switch (c)
 		{
 		case '0':
-			switch(b)
-			{
-			case '4':
-				inst = "MOV";
-				break;
-			case '5':
-				inst = "ADD";
-				break;
-			case '6':
-				inst = "SUB";
-				break;
-			case '7':
-				inst = "MUL";
-				break;
-			case '8':
-				inst = "DIV";
-				break;
-			case '9':
-				inst = "AND";
-				break;
-			case 'A':
-				inst = "OR";
-				break;
-			}
-			break;
+			return 0;
 		case '1':
-			inst = "SLT";
-			break;
+			return 1;
+		case '2':
+			return 2;
+		case '3':
+			return 3;
 		case '4':
-			switch (b)
-			{
-			case '2':
-				inst = "ST";
-				break;
-			case '3':
-				inst = "LW";
-				break;
-			case 'B':
-				inst = "MOVI";
-				break;
-			case 'C':
-				inst = "ADDI";
-				break;
-			case 'D':
-				inst = "MULI";
-				break;
-			case 'E':
-				inst = "DIVI";
-				break;
-			case 'F':
-				inst = "LDI";
-				break;
-			}
-			break;
+			return 4;
 		case '5':
-			switch (b)
-			{
-			case '1':
-				inst = "SLTI";
-				break;
-			case '5':
-				inst = "BEQ";
-				break;
-			case '6':
-				inst = "BNE";
-				break;
-			case '7':
-				inst = "BEZ";
-				break;
-			case '8':
-				inst = "BNZ";
-				break;
-			case '9':
-				inst = "BGZ";
-				break;
-			case 'A':
-				inst = "BLZ";
-				break;
-			}
-			break;
+			return 5;
+		case '6':
+			return 6;
+		case '7':
+			return 7;
+		case '8':
+			return 8;
 		case '9':
-			switch (b)
-			{
-			case '2':
-				inst = "HLT";
-				break;
-			case '4':
-				inst = "JMP";
-				break;
-			}
-			break;
+			return 9;
+		case 'A':
+			return 10;
+		case 'B':
+			return 11;
 		case 'C':
-			switch (b)
-			{
-			case '0':
-				inst = "RD";
-				break;
-			case '1':
-				inst = "WR";
-				break;
-			}
-			break;
-			}
-		return inst;
+			return 12;
+		case 'D':
+			return 13;
+		case 'E':
+			return 14;
+		case 'F':
+			return 15;
+		}
+		return -1;
 	}
+			
 }

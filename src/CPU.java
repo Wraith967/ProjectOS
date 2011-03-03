@@ -25,7 +25,7 @@ public class CPU {
 	char[][] outputBuffer; // holds values of job output buffers
 	char[][] tempBuffer; // holds values of job temporary buffers
 	MemoryManager mgr;
-	String decodeInst;
+	int[] decodeInst;
 	
 	public CPU(MemoryManager mgr)
 	{
@@ -39,7 +39,7 @@ public class CPU {
 		inst = new char[8];
 		this.mgr = mgr;
 		cpuID = cpuNum++;
-		decodeInst = null;
+		decodeInst = new int[5];
 	}
 	
 	public void runJob()
@@ -47,8 +47,8 @@ public class CPU {
 		while (PC < jobSize)
 		{
 			Fetch();
-			decodeInst = dec.DecodeInst(inst[0], inst[1]);
-			exe.ExecInst(decodeInst, inst);
+			decodeInst = dec.DecodeInst(inst);
+			exe.ExecInst(decodeInst);
 		}
 	}
 	

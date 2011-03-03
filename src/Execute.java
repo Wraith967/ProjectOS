@@ -16,9 +16,61 @@ public class Execute {
 		pc = c;
 	}
 	
-	public void ExecInst(String code, char[] c)
+	public void ExecInst(int[] c)
 	{
 		//TODO Finish this code
+		for (int i=0; i<5; i++)
+			System.out.print(c[i]+ " ");
+		System.out.println();
+		
+		switch (c[0])
+		{
+		case 0:
+			switch (c[1])
+			{
+			case 4:
+			case 5:
+			case 6:
+			case 7:
+			case 8:
+			case 9:
+			case 10:
+			case 16:
+			}
+			break;
+		case 1:
+			switch (c[1])
+			{
+			case 2:
+			case 3:
+			case 11:
+			case 12:
+			case 13:
+			case 14:
+			case 15:
+			case 17:
+			case 21:
+			case 22:
+			case 23:
+			case 24:
+			case 25:
+			case 26:
+			}
+			break;
+		case 2:
+			switch (c[1])
+			{
+			case 14:
+			case 16:
+			}
+			break;
+		case 3:
+			switch (c[1])
+			{
+			case 0:
+			case 1:
+			}
+		}
 	}
 	
 }
