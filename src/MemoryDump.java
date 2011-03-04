@@ -11,9 +11,11 @@ public class MemoryDump {
 	
 	public static void MemDump(char[][] disk, MemoryManager mgr, int jobID, PCB p)
 	{
-		int size = p.codeSize+p.inputBuffer+p.outputBuffer+p.tempBuffer;
-		for (int i=0; i<size; i++)
+		for (int i=0; i<p.totalSize; i++)
+		{
 			disk[p.beginIndex+i] = mgr.ReadInstruction(i);
+			System.out.println(mgr.ReadInstruction(i));
+		}
 	}
 
 }
