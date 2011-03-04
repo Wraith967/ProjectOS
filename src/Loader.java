@@ -67,8 +67,8 @@ public class Loader {
 					pArr[y].outputBuffer = jobData[1];
 					pArr[y].tempBuffer = jobData[2];
 				}
-				else System.out.println(pArr[y++]);
-					//y++;
+				else //System.out.println(pArr[y++]);
+					pArr[y++].ComputeSize();
 			}
 		}
 	}

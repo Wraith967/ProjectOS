@@ -18,6 +18,7 @@ public class PCB {
 	int tempBuffer; // Size of temporary buffer
 	int beginIndex; // Index of first instruction in disk
 	int base_Register; // Index of first instruction in memory
+	int totalSize;
 	
 	double waitTime; // Length of time job has waited on disk
 	double runTime; // Length of time job was on CPU
@@ -36,6 +37,11 @@ public class PCB {
 		
 		return ret;
 		
+	}
+	
+	public void ComputeSize()
+	{
+		totalSize = codeSize + inputBuffer + outputBuffer + tempBuffer;
 	}
 
 }

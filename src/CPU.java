@@ -5,12 +5,9 @@
 /**
  * @author Ben
  * Created: 2/10/2011
- * Last Edit: 2/28/2011
+ * Last Edit: 3/3/2011
  */
 public class CPU {
-	/** TODO Create this class
-	 * I made this just so I can use it in OSDriver
-	 */
 	
 	char[][] cache; // Interior CPU cache
 	int PC; // Program counter
@@ -50,6 +47,7 @@ public class CPU {
 			decodeInst = dec.DecodeInst(inst);
 			exe.ExecInst(decodeInst);
 		}
+		//System.out.println();
 	}
 	
 	public void Fetch()

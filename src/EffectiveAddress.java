@@ -5,23 +5,30 @@
 /**
  * @author Ben
  * Created: 2/17/2011
- * Last Edit: 2/17/2011
+ * Last Edit: 3/3/2011
  */
 public class EffectiveAddress {
-
-	public EffectiveAddress()
-	{
-		
-	}
 	
-	public int DirectAddress(int offset, int base)
+	/**
+	 * 
+	 * @param offset 16-bit offset
+	 * @param base Content of base register
+	 * @return
+	 */
+	public static int DirectAddress(int offset, int base)
 	{
-		return base+offset;
+		return (base+offset)/4;
 	}
-	
-	public int IndirectAddress(int offset, int base, int index)
+	/**
+	 * 
+	 * @param offset 16-bit offset
+	 * @param base Content of base register
+	 * @param index Content of index register
+	 * @return
+	 */
+	public static int IndirectAddress(int offset, int base, int index)
 	{
-			return base+index+offset;
+			return (base+index+offset)/4;
 	}
 	
 }

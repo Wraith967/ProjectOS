@@ -22,7 +22,7 @@ public class OSDriver {
 		//Data
 		char[][] disk = new char[2048][8]; // holds all instructions as 8 chars
 		PCB[] PCBarr = new PCB[30];
-		double avgWaitTime=0.0, avgRunTime=0.0;
+		//double avgWaitTime=0.0, avgRunTime=0.0;
 		
 		for (int i=0; i<30; i++)
 			PCBarr[i] = new PCB();
@@ -41,7 +41,15 @@ public class OSDriver {
 			sched.LoadJob(i, comp, PCBarr[i], disk);
 			disp.LoadData(i, comp, PCBarr[i]);
 			comp.runJob();
+			MemoryDump.MemDump(disk, mgr, i, PCBarr[i]);
 		}
+		for (int i=0; i<30; i++)
+		{
+			for (int j=0; j<PCBarr[i].totalSize; j++)
+				System.out.println(disk[PCBarr[i].beginIndex+j]);
+			System.out.println();
+		}
+		
 		/*for (int i=0; i<30; i++)
 		{
 			avgWaitTime += PCBarr[i].waitTime;
