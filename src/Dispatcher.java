@@ -24,6 +24,7 @@ public class Dispatcher {
 		for (int i=0; i<16; i++)
 			comp.registerBank[i]=0;
 		comp.jobSize = p.codeSize;
+		comp.bufferSize = p.totalSize-p.codeSize;
 		// TODO Load remaining data from PCB to CPU
 	}
 	
