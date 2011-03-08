@@ -5,7 +5,7 @@
 /**
  * @author Ben
  * Created: 2/10/2011
- * Last Edit: 3/3/2011
+ * Last Edit: 3/8/2011
  */
 public class CPU {
 	
@@ -18,16 +18,15 @@ public class CPU {
 	Decode dec; // decodes instructions
 	Execute exe; // performs instructions
 	char[] inst; // array for each instruction
-	int[] inputBuffer; // holds values of job input buffers
-	int[] outputBuffer; // holds values of job output buffers
-	int[] tempBuffer; // holds values of job temporary buffers
-	MemoryManager mgr;
-	int[] decodeInst;
-	int bufferSize; // for debug purposes
+	MemoryManager mgr; // for access to memory
+	int[] decodeInst; // array for decoded instruction
+	int totalSize; // for debug purposes
+	int alpha, omega; // begin/end indices for memory usage
+	boolean done;
 	
 	public CPU(MemoryManager mgr)
 	{
-		cache = new char[28][8]; // 28 is maximum instruction length 
+		cache = new char[72][8]; // 28 is maximum instruction length 
 		PC = -1;
 		jobID = -1;
 		jobSize = -1;
@@ -38,6 +37,7 @@ public class CPU {
 		this.mgr = mgr;
 		cpuID = cpuNum++;
 		decodeInst = new int[5];
+		done = false;
 	}
 	
 	public void runJob()
@@ -53,7 +53,7 @@ public class CPU {
 	
 	public void Fetch()
 	{
-		inst = mgr.ReadInstruction(PC++);
+		inst = cache[PC++];
 		//System.out.println(inst);
 	}
 	

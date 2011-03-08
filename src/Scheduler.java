@@ -5,22 +5,79 @@
 /**
  * @author Ben
  * Created: 2/10/2011
- * Last Edit: 2/23/2011
+ * Last Edit: 3/8/2011
  */
 public class Scheduler {
-	/** TODO Create this class
-	 * I made this just so I can use it in OSDriver
-	 */
+	
 	MemoryManager mgr;
-	int jobSize, jobBegin, buffer[], i, totalBuffer;
+	/**
+	 * jobBegin = beginning index of a job in disk
+	 * i,j = indices
+	 * dest = used to find actual address for memory
+	 * index = similar to Program Counter for memory
+	 */
+	int jobBegin, i, j, dest, index;
 	
 	public Scheduler(MemoryManager mgr)
 	{
 		this.mgr = mgr;
-		jobSize = -1;
 		jobBegin = -1;
-		buffer = new int[3];
 		i = -1;
+		j = -1;
+		dest = -1;
+		index = -1;
+	}
+	
+	/**
+	 * 
+	 * @param rq
+	 * @param p
+	 * @param disk
+	 */
+	public void LoadMulti(int[] rq, PCB[] p, char[][] disk)
+	{
+		index = 0;
+		dest = 0;
+			for (i=0; i<rq.length; i++)
+			{
+				jobBegin = p[i].beginIndex;
+				if (jobBegin == -1)
+				{
+					System.out.println("Invalid PCB");
+				}
+				else
+				{
+					p[i].base_Register = index; // modify for m-scheduler later
+					for (j=0; i<p[i].totalSize; j++)
+					{
+						mgr.WriteInstruction(dest+j,disk[jobBegin+j]);
+					}
+					dest += 72;
+					index += 72;
+				}
+			}
+	}
+	
+	/**
+	 * 
+	 * @param rq
+	 * @param p
+	 * @param disk
+	 * @param index
+	 */
+	public void LoadSingle(int[] rq, PCB p, char[][] disk, int index)
+	{
+		jobBegin = p.beginIndex;
+		if (jobBegin == -1)
+		{
+			System.out.println("Invalid PCB");
+		}
+		else
+		{
+			p.base_Register = rq[index];
+			for (i=0; i<p.totalSize; i++)
+				mgr.WriteInstruction(rq[index] + i, disk[jobBegin+i]);
+		}
 	}
 	
 	/**
@@ -28,35 +85,23 @@ public class Scheduler {
 	 * @param jobId -- number of job from PCB
 	 * @param comp -- which computer is running job
 	 */
-	public void LoadJob(int jobId, CPU comp, PCB p, char[][] disk)
+	public void LoadJob(CPU comp, PCB p, char[][] disk)
 	{
-		jobSize = p.codeSize;
 		jobBegin = p.beginIndex;
-		if ((jobSize == -1) || (jobBegin == -1))
+		if (jobBegin == -1)
 		{
 			System.out.println("Invalid PCB");
 		}
 		else
 		{
-			buffer[0] = p.inputBuffer;
-			buffer[1] = p.outputBuffer;
-			buffer[2] = p.tempBuffer;
-			totalBuffer = buffer[0]+buffer[1]+buffer[2];
 			p.base_Register = 0; // modify for m-scheduler later
 			p.cpuID = comp.cpuID;
-			comp.jobID = jobId;
-			for (i=0; i<jobSize; i++)
+			comp.jobID = p.jobID;
+			dest = EffectiveAddress.DirectAddress(jobBegin*4, 0);
+			for (i=0; i<p.totalSize; i++)
 			{
-				mgr.WriteInstruction(i,disk[jobBegin+i]);
+				mgr.WriteInstruction(dest+i,disk[jobBegin+i]);
 			}
-			for (i=0; i<totalBuffer; i++)
-			{
-				mgr.WriteInstruction(jobSize+i, disk[jobBegin+jobSize+i]);
-			}
-			/*for (i=0; i<jobSize; i++)
-			{
-				comp.cache[i] = mgr.ReadInstruction(i);
-			}*/
 		}
 	}
 	

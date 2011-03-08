@@ -19,6 +19,7 @@ public class PCB {
 	int beginIndex; // Index of first instruction in disk
 	int base_Register; // Index of first instruction in memory
 	int totalSize;
+	int[] registerBank = new int[16];
 	
 	double waitTime; // Length of time job has waited on disk
 	double runTime; // Length of time job was on CPU
@@ -42,6 +43,8 @@ public class PCB {
 	public void ComputeSize()
 	{
 		totalSize = codeSize + inputBuffer + outputBuffer + tempBuffer;
+		for (int i=0; i<16; i++)
+			registerBank[i]=0;
 	}
 
 }

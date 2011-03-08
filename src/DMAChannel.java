@@ -10,20 +10,22 @@
 public class DMAChannel {
 
 	MemoryManager mgr;
+	CPU pc;
 	
-	public DMAChannel(MemoryManager mgr)
+	public DMAChannel(MemoryManager mgr, CPU pc)
 	{
 		this.mgr = mgr;
+		this.pc = pc;
 	}
 	
 	public char[] Read(int n, int m)
 	{
-		return mgr.ReadInstruction(EffectiveAddress.DirectAddress(n,m)).clone();
+		return pc.cache[EffectiveAddress.DirectAddress(n,m)].clone();
 	}
 	
 	public void Write(int n, int m, char[] c)
 	{
-		mgr.WriteInstruction(EffectiveAddress.DirectAddress(n, m), c);
+		pc.cache[EffectiveAddress.DirectAddress(n, m)] = c;
 	}
 	
 }

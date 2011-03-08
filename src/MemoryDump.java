@@ -19,7 +19,7 @@ public class MemoryDump {
 	}
 	public static void BufferDump(MemoryManager mgr, int jobID, int codeSize, int totalSize)
 	{
-		for (int i=codeSize; i<codeSize+totalSize; i++)
+		for (int i=codeSize; i<totalSize; i++)
 			System.out.println(mgr.ReadInstruction(i));
 	}
 

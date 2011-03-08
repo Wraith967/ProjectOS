@@ -5,7 +5,7 @@
 /**
  * @author Ben
  * Created: 2/17/2011
- * Last Edit: 3/3/2011
+ * Last Edit: 3/8/2011
  */
 public class Execute {
 	
@@ -21,7 +21,7 @@ public class Execute {
 		pc = c;
 		mgr = m;
 		inst = new char[8];
-		dm = new DMAChannel(m);
+		dm = new DMAChannel(m, c);
 	}
 	
 	/**
@@ -159,6 +159,7 @@ public class Execute {
 		case 18:
 			//System.out.println("HLT" + " " + c[2] + " " + c[3] + " " + c[4]);
 			pc.PC = pc.jobSize; // Force PC to end of job
+			pc.done = true;
 			break;
 		case 20:
 			//System.out.println("JMP" + " " + c[2] + " " + c[3] + " " + c[4]);
