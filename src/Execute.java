@@ -14,12 +14,14 @@ public class Execute {
 	char[] inst, hexArr;
 	String hex; 
 	int sum, power, i, j;
+	DMAChannel dm;
 	
 	public Execute(CPU c, MemoryManager m)
 	{
 		pc = c;
 		mgr = m;
 		inst = new char[8];
+		dm = new DMAChannel(m);
 	}
 	
 	/**
@@ -38,9 +40,9 @@ public class Execute {
 			//System.out.println("RD" + " " + c[2] + " " + c[3] + " " + c[4]);
 			sum = 0;
 			if (c[4] == 0)
-				inst = mgr.ReadInstruction(EffectiveAddress.DirectAddress(0,pc.registerBank[c[3]])).clone();
+				inst = dm.Read(0, pc.registerBank[c[3]]);
 			else
-				inst = mgr.ReadInstruction(EffectiveAddress.DirectAddress(0,c[4])).clone();
+				inst = dm.Read(0, c[4]);
 			for (i=0; i<8; i++)
 			{
 				power = 1;
@@ -62,9 +64,9 @@ public class Execute {
 			for (j=0; j<hexArr.length; j++)
 				inst[i+j] = hexArr[j];
 			if (c[4]==0)
-				mgr.WriteInstruction(EffectiveAddress.DirectAddress(0,pc.registerBank[c[3]]), inst.clone());
+				dm.Write(0, pc.registerBank[c[3]], inst.clone());
 			else
-				mgr.WriteInstruction(EffectiveAddress.DirectAddress(0,c[4]), inst);
+				dm.Write(0, c[4], inst.clone());
 			break;
 		case 2:
 			//System.out.println("ST" + " " + c[2] + " " + c[3] + " " + c[4]);
@@ -75,12 +77,12 @@ public class Execute {
 				inst[i] = '0';
 			for (j=0; j<hexArr.length; j++)
 				inst[i+j] = hexArr[j];
-			mgr.WriteInstruction(EffectiveAddress.DirectAddress(0,pc.registerBank[c[3]]), inst.clone());
+			dm.Write(0, pc.registerBank[c[3]], inst.clone());
 			break;
 		case 3:
 			//System.out.println("LW" + " " + c[2] + " " + c[3] + " " + c[4]);
 			sum = 0;
-			inst = mgr.ReadInstruction(EffectiveAddress.DirectAddress(c[4],pc.registerBank[c[2]])).clone();
+			inst = dm.Read(c[4], pc.registerBank[c[2]]);
 			for (i=0; i<8; i++)
 			{
 				power = 1;
