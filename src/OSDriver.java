@@ -44,12 +44,12 @@ public class OSDriver {
 			MemoryDump.MemDump(disk, mgr, i, PCBarr[i]);
 			System.out.println();
 		}
-		/*for (int i=0; i<30; i++)
+		for (int i=0; i<30; i++)
 		{
 			for (int j=0; j<PCBarr[i].totalSize; j++)
 				System.out.println(disk[PCBarr[i].beginIndex+j]);
 			System.out.println();
-		}*/
+		}
 		
 		/*for (int i=0; i<30; i++)
 		{
