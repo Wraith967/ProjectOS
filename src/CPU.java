@@ -27,7 +27,7 @@ public class CPU implements Runnable{
 	
 	public CPU(MemoryManager mgr)
 	{
-		cache = new char[72][8]; // 28 is maximum instruction length 
+		cache = new char[72][8]; // 72 is maximum total length 
 		PC = -1;
 		jobID = -1;
 		jobSize = -1;
@@ -38,12 +38,12 @@ public class CPU implements Runnable{
 		this.mgr = mgr;
 		cpuID = cpuNum++;
 		decodeInst = new int[5];
-		changeIndex = new int[24];
 	}
 	
 	public void run()
 	{
 		numChange = 0;
+		changeIndex = new int[24];
 		//Dispatcher.threadMessage("working");
 		while (PC < jobSize)
 		{

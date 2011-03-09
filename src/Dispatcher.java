@@ -23,7 +23,8 @@ public class Dispatcher {
 	int pcb; // index for PCBs
 	int readyIndex; // index for ready queue
 	Thread[] t; // runs CPUs as threads
-	int isDone; // checks for completion of application
+	boolean isDone; // checks for completion of application
+	boolean CPUDone;
 	int doneIndex; // index of finished CPU
 	int i;
 	
@@ -32,9 +33,10 @@ public class Dispatcher {
 		this.mgr = mgr;
 		this.sch = sch;
 		t = new Thread[4];
-		isDone = 0;
+		isDone = false;
 		pcb = -1;
 		readyIndex = 0;
+		CPUDone = false;
 	}
 	
 	/**
@@ -51,29 +53,43 @@ public class Dispatcher {
 		}
 		// TODO Add watch code on CPUs
 		i = 0;
-		while (isDone != 1)
+		while (!isDone)
 		{
 			if (!t[i].isAlive())
 			{
 				//threadMessage("CPU " + i + " is done");
 				doneIndex = i;
 				ShortTermLoader.DataSwap(mgr, c[doneIndex], 1);
-				MemoryDump.MemDump(sch.disk, mgr, p[c[doneIndex].jobID-1]);
+				MemoryDump.MemDump(sch.disk, mgr, p[(c[doneIndex].jobID-1)]);
 				//System.out.println();
 				if (pcb < 29)
 				{
-					sch.LoadSingle(rq, p[pcb], (readyIndex));
-					LoadData(c[doneIndex], p[++pcb], rq[readyIndex++], doneIndex);
+					sch.LoadSingle(rq, p[++pcb], (readyIndex));
+					LoadData(c[doneIndex], p[pcb], rq[readyIndex++], doneIndex);
 					readyIndex %= 14;
 				}
 				else
 				{
-					//threadMessage("" + isDone++);
-					isDone++;
+					isDone = true;
 				}
 			}
 			i++;
 			i %= 4;
+		}
+		for (i=0; i<4; i++)
+		{
+			while (!CPUDone)
+			{
+				if (!t[i].isAlive())
+				{
+					//threadMessage("CPU " + i + " is done");
+					doneIndex = i;
+					ShortTermLoader.DataSwap(mgr, c[doneIndex], 1);
+					MemoryDump.MemDump(sch.disk, mgr, p[(c[doneIndex].jobID-1)]);
+					CPUDone = true;
+				}
+			}
+			CPUDone = false;
 		}
 	}
 	

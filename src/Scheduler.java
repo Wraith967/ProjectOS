@@ -16,7 +16,7 @@ public class Scheduler {
 	 * dest = used to find actual address for memory
 	 * index = similar to Program Counter for memory
 	 */
-	int jobBegin, i, j, dest, index;
+	int jobBegin, i, j, dest;
 	char[][] disk;
 	
 	public Scheduler(MemoryManager mgr, char[][] disk)
@@ -26,7 +26,6 @@ public class Scheduler {
 		i = -1;
 		j = -1;
 		dest = -1;
-		index = -1;
 		this.disk = disk;
 	}
 	
@@ -38,7 +37,6 @@ public class Scheduler {
 	 */
 	public void LoadMulti(int[] rq, PCB[] p)
 	{
-		index = 0;
 		dest = 0;
 			for (i=0; i<rq.length; i++)
 			{
@@ -49,14 +47,13 @@ public class Scheduler {
 				}
 				else
 				{
-					rq[i] = index;
-					p[i].base_Register = index; // modify for m-scheduler later
+					rq[i] = dest;
+					p[i].base_Register = dest; // modify for m-scheduler later
 					for (j=0; j<p[i].totalSize; j++)
 					{
 						mgr.WriteInstruction(dest+j,disk[jobBegin+j]);
 					}
 					dest += 72;
-					index += 72;
 				}
 			}
 	}
