@@ -9,6 +9,10 @@
  */
 public class Dispatcher {
 	
+	/**
+	 * This method is for debugging purposes
+	 * @param message
+	 */
 	static void threadMessage(String message) {
         String threadName = Thread.currentThread().getName();
         System.out.format("%s: %s%n", threadName, message);
@@ -47,13 +51,14 @@ public class Dispatcher {
 		}
 		// TODO Add watch code on CPUs
 		i = 0;
-		while (isDone != 4)
+		while (isDone != 1)
 		{
 			if (!t[i].isAlive())
 			{
+				//threadMessage("CPU " + i + " is done");
 				doneIndex = i;
 				ShortTermLoader.DataSwap(mgr, c[doneIndex], 1);
-				MemoryDump.MemDump(sch.disk, mgr, pcb, p[pcb]);
+				MemoryDump.MemDump(sch.disk, mgr, p[c[doneIndex].jobID-1]);
 				//System.out.println();
 				if (pcb < 29)
 				{
@@ -85,10 +90,12 @@ public class Dispatcher {
 			comp.registerBank[j]=p.registerBank[j];
 		comp.jobSize = p.codeSize;
 		comp.totalSize = p.totalSize;
+		comp.jobID = p.jobID;
 		comp.alpha = index;
 		comp.omega = comp.alpha + comp.totalSize;
 		ShortTermLoader.DataSwap(mgr, comp, 0);
 		t[i] = new Thread(comp);
+		//threadMessage("Starting CPU " + i);
         t[i].start();
 	}
 	

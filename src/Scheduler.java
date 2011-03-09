@@ -49,6 +49,7 @@ public class Scheduler {
 				}
 				else
 				{
+					rq[i] = index;
 					p[i].base_Register = index; // modify for m-scheduler later
 					for (j=0; j<p[i].totalSize; j++)
 					{

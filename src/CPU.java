@@ -22,6 +22,8 @@ public class CPU implements Runnable{
 	int[] decodeInst; // array for decoded instruction
 	int totalSize; // for debug purposes
 	int alpha, omega; // begin/end indices for memory usage
+	int[] changeIndex; // addresses of changes to memory
+	int numChange; // amount of changes
 	
 	public CPU(MemoryManager mgr)
 	{
@@ -36,13 +38,15 @@ public class CPU implements Runnable{
 		this.mgr = mgr;
 		cpuID = cpuNum++;
 		decodeInst = new int[5];
+		changeIndex = new int[24];
 	}
 	
 	public void run()
 	{
+		numChange = 0;
+		//Dispatcher.threadMessage("working");
 		while (PC < jobSize)
 		{
-			//Dispatcher.threadMessage("working");
 			Fetch();
 			decodeInst = dec.DecodeInst(inst);
 			exe.ExecInst(decodeInst);

@@ -64,9 +64,15 @@ public class Execute {
 			for (j=0; j<hexArr.length; j++)
 				inst[i+j] = hexArr[j];
 			if (c[4]==0)
+			{
 				dm.Write(0, pc.registerBank[c[3]], inst.clone());
+				pc.changeIndex[pc.numChange++] = EffectiveAddress.DirectAddress(0,pc.registerBank[c[3]]);
+			}
 			else
+			{
 				dm.Write(0, c[4], inst.clone());
+				pc.changeIndex[pc.numChange++] = EffectiveAddress.DirectAddress(0,c[4]);
+			}
 			break;
 		case 2:
 			//System.out.println("ST" + " " + c[2] + " " + c[3] + " " + c[4]);
@@ -78,6 +84,7 @@ public class Execute {
 			for (j=0; j<hexArr.length; j++)
 				inst[i+j] = hexArr[j];
 			dm.Write(0, pc.registerBank[c[3]], inst.clone());
+			pc.changeIndex[pc.numChange++] = EffectiveAddress.DirectAddress(0,pc.registerBank[c[3]]);
 			break;
 		case 3:
 			//System.out.println("LW" + " " + c[2] + " " + c[3] + " " + c[4]);

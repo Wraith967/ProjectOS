@@ -9,7 +9,7 @@
  */
 public class MemoryDump {
 	
-	public static void MemDump(char[][] disk, MemoryManager mgr, int jobID, PCB p)
+	public static void MemDump(char[][] disk, MemoryManager mgr, PCB p)
 	{
 		for (int i=0; i<p.totalSize; i++)
 		{

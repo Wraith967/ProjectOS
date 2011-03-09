@@ -23,6 +23,7 @@ public class OSDriver {
 		char[][] disk = new char[2048][8]; // holds all instructions as 8 chars
 		PCB[] PCBarr = new PCB[30];
 		int[] readyQueue = new int[14];
+		//int totalCode = 0;
 		//double avgWaitTime=0.0, avgRunTime=0.0;
 		
 		for (int i=0; i<30; i++)
@@ -51,11 +52,15 @@ public class OSDriver {
 //		}
 		for (int i=0; i<30; i++)
 		{
+			//totalCode += PCBarr[i].totalSize;
+			System.out.println(i);
+			System.out.println(PCBarr[i].totalSize);
 			for (int j=0; j<PCBarr[i].totalSize; j++)
 				System.out.println(disk[PCBarr[i].beginIndex+j]);
 			System.out.println();
 		}
-		
+//		for (int i=0; i<totalCode; i++)
+//			System.out.println(disk[i]);
 //		for (int i=0; i<30; i++)
 //		{
 //			avgWaitTime += PCBarr[i].waitTime;

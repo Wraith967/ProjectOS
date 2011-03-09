@@ -71,6 +71,7 @@ public class Loader {
 				{
 					//System.out.println(pArr[y]);
 					pArr[y++].ComputeSize();
+					//System.out.println(pArr[y].totalSize);
 				}
 			}
 		}
