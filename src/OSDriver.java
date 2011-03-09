@@ -65,9 +65,6 @@ public class OSDriver {
 //		avgRunTime /= 30;
 		
 		
-		// TODO Add remaining driver code
-		
-		
 		// PC Cache size needed: 72 words		
 	}
 }

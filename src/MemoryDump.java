@@ -14,7 +14,7 @@ public class MemoryDump {
 		for (int i=0; i<p.totalSize; i++)
 		{
 			disk[p.beginIndex+i] = mgr.ReadInstruction(p.base_Register + i).clone();
-			System.out.println(mgr.ReadInstruction(p.base_Register + i));
+			//System.out.println(mgr.ReadInstruction(p.base_Register + i));
 		}
 	}
 	public static void BufferDump(MemoryManager mgr, int jobID, int codeSize, int totalSize)

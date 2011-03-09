@@ -22,7 +22,6 @@ public class CPU implements Runnable{
 	int[] decodeInst; // array for decoded instruction
 	int totalSize; // for debug purposes
 	int alpha, omega; // begin/end indices for memory usage
-	boolean done;
 	
 	public CPU(MemoryManager mgr)
 	{
@@ -37,7 +36,6 @@ public class CPU implements Runnable{
 		this.mgr = mgr;
 		cpuID = cpuNum++;
 		decodeInst = new int[5];
-		done = false;
 	}
 	
 	public void run()

@@ -159,7 +159,6 @@ public class Execute {
 		case 18:
 			//System.out.println("HLT" + " " + c[2] + " " + c[3] + " " + c[4]);
 			pc.PC = pc.jobSize; // Force PC to end of job
-			pc.done = true;
 			break;
 		case 20:
 			//System.out.println("JMP" + " " + c[2] + " " + c[3] + " " + c[4]);
