@@ -7,7 +7,7 @@
  * Created: 2/10/2011
  * Last Edit: 3/8/2011
  */
-public class CPU {
+public class CPU implements Runnable{
 	
 	char[][] cache; // Interior CPU cache
 	int PC; // Program counter
@@ -40,10 +40,11 @@ public class CPU {
 		done = false;
 	}
 	
-	public void runJob()
+	public void run()
 	{
 		while (PC < jobSize)
 		{
+			//Dispatcher.threadMessage("working");
 			Fetch();
 			decodeInst = dec.DecodeInst(inst);
 			exe.ExecInst(decodeInst);

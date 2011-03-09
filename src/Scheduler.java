@@ -17,8 +17,9 @@ public class Scheduler {
 	 * index = similar to Program Counter for memory
 	 */
 	int jobBegin, i, j, dest, index;
+	char[][] disk;
 	
-	public Scheduler(MemoryManager mgr)
+	public Scheduler(MemoryManager mgr, char[][] disk)
 	{
 		this.mgr = mgr;
 		jobBegin = -1;
@@ -26,6 +27,7 @@ public class Scheduler {
 		j = -1;
 		dest = -1;
 		index = -1;
+		this.disk = disk;
 	}
 	
 	/**
@@ -34,7 +36,7 @@ public class Scheduler {
 	 * @param p
 	 * @param disk
 	 */
-	public void LoadMulti(int[] rq, PCB[] p, char[][] disk)
+	public void LoadMulti(int[] rq, PCB[] p)
 	{
 		index = 0;
 		dest = 0;
@@ -48,7 +50,7 @@ public class Scheduler {
 				else
 				{
 					p[i].base_Register = index; // modify for m-scheduler later
-					for (j=0; i<p[i].totalSize; j++)
+					for (j=0; j<p[i].totalSize; j++)
 					{
 						mgr.WriteInstruction(dest+j,disk[jobBegin+j]);
 					}
@@ -65,8 +67,9 @@ public class Scheduler {
 	 * @param disk
 	 * @param index
 	 */
-	public void LoadSingle(int[] rq, PCB p, char[][] disk, int index)
+	public void LoadSingle(int[] rq, PCB p, int index)
 	{
+		//Dispatcher.threadMessage("LoadSingle" + index);
 		jobBegin = p.beginIndex;
 		if (jobBegin == -1)
 		{
@@ -85,7 +88,7 @@ public class Scheduler {
 	 * @param jobId -- number of job from PCB
 	 * @param comp -- which computer is running job
 	 */
-	public void LoadJob(CPU comp, PCB p, char[][] disk)
+	public void LoadJob(CPU comp, PCB p)
 	{
 		jobBegin = p.beginIndex;
 		if (jobBegin == -1)

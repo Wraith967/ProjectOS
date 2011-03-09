@@ -17,7 +17,7 @@ public class OSDriver {
 	 * @param args
 	 * @throws IOException 
 	 */
-	public static void main(String[] args) throws IOException{
+	public static void main(String[] args) throws IOException, InterruptedException{
 		
 		//Data
 		char[][] disk = new char[2048][8]; // holds all instructions as 8 chars
@@ -31,7 +31,7 @@ public class OSDriver {
 		//Modules
 		Loader control = new Loader(); // handles reading in and parsing of all instructions
 		MemoryManager mgr = new MemoryManager(); // handles RAM
-		Scheduler sched = new Scheduler(mgr); // moves job to CPU
+		Scheduler sched = new Scheduler(mgr, disk); // moves job to CPU
 		Dispatcher disp = new Dispatcher(mgr, sched); // moves job data to CPU
 		CPU[] comp = new CPU[4]; // handles processing
 		for (int i=0; i<4; i++)
@@ -39,31 +39,31 @@ public class OSDriver {
 		
 		//Method Calls
 		control.runLoad(disk, "DataFile2.txt", PCBarr); // reads in datafile
-		sched.LoadMulti(readyQueue, PCBarr, disk);
+		sched.LoadMulti(readyQueue, PCBarr);
 		disp.MultiDispatch(comp, PCBarr, readyQueue);
-		/*for (int i=0; i<30; i++)
-		{
-			sched.LoadJob(comp[0], PCBarr[i], disk);
-			disp.LoadData(comp[0], PCBarr[i]);
-			comp[0].runJob();
-			MemoryDump.MemDump(disk, mgr, i, PCBarr[i]);
-			System.out.println();
-		}*/
-		/*for (int i=0; i<30; i++)
+//		for (int i=0; i<30; i++)
+//		{
+//			sched.LoadJob(comp[0], PCBarr[i], disk);
+//			disp.LoadData(comp[0], PCBarr[i]);
+//			comp[0].runJob();
+//			MemoryDump.MemDump(disk, mgr, i, PCBarr[i]);
+//			System.out.println();
+//		}
+		for (int i=0; i<30; i++)
 		{
 			for (int j=0; j<PCBarr[i].totalSize; j++)
 				System.out.println(disk[PCBarr[i].beginIndex+j]);
 			System.out.println();
-		}*/
-		
-		/*for (int i=0; i<30; i++)
-		{
-			avgWaitTime += PCBarr[i].waitTime;
-			avgRunTime += PCBarr[i].runTime;
 		}
-		avgWaitTime /= 30;
-		avgRunTime /= 30;
-		*/
+		
+//		for (int i=0; i<30; i++)
+//		{
+//			avgWaitTime += PCBarr[i].waitTime;
+//			avgRunTime += PCBarr[i].runTime;
+//		}
+//		avgWaitTime /= 30;
+//		avgRunTime /= 30;
+		
 		
 		// TODO Add remaining driver code
 		
