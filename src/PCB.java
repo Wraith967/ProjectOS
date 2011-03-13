@@ -20,8 +20,12 @@ public class PCB {
 	int base_Register; // Index of first instruction in memory
 	int totalSize;
 	
-	double waitTime; // Length of time job has waited on disk
-	double runTime; // Length of time job was on CPU
+	long waitTime; // Length of time job has waited on disk
+	long runTime; // Length of time job was on CPU
+	long diskStart;
+	long diskEnd;
+	long runStart;
+	long runEnd;
 	
 	// TODO Add remaining PCB attributes
 	
@@ -42,6 +46,12 @@ public class PCB {
 	public void ComputeSize()
 	{
 		totalSize = codeSize + inputBuffer + outputBuffer + tempBuffer;
+	}
+	
+	public void ComputeTime()
+	{
+		waitTime = diskEnd - diskStart;
+		runTime = runEnd - runStart;
 	}
 
 }

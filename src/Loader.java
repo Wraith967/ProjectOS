@@ -83,7 +83,8 @@ public class Loader {
 				}
 				else
 				{
-					System.out.println(pArr[y]);
+					//System.out.println(pArr[y]);
+					pArr[y].diskStart = System.nanoTime();
 					pArr[y++].ComputeSize();
 					//System.out.println(pArr[y++].totalSize);
 				}

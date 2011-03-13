@@ -36,6 +36,7 @@ public class Scheduler {
 		}
 		else
 		{
+			p.diskEnd = System.nanoTime();
 			p.base_Register = 0; // modify for m-scheduler later
 			p.cpuID = comp.cpuID;
 			comp.jobID = jobId;
@@ -43,6 +44,7 @@ public class Scheduler {
 			{
 				mgr.WriteInstruction(i,disk[jobBegin+i]);
 			}
+			p.runStart = System.nanoTime();
 		}
 	}
 	

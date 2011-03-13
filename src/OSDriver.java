@@ -24,7 +24,7 @@ public class OSDriver {
 		//Data
 		char[][] disk = new char[2048][8]; // holds all instructions as 8 chars
 		PCB[] PCBarr = new PCB[30];
-		//double avgWaitTime=0.0, avgRunTime=0.0;
+		long avgWaitTime=0, avgRunTime=0;
 		
 		for (int i=0; i<30; i++)
 			PCBarr[i] = new PCB();
@@ -43,20 +43,24 @@ public class OSDriver {
 			sched.LoadJob(i, comp, PCBarr[i], disk);
 			disp.LoadData(i, comp, PCBarr[i]);
 			comp.runJob();
+			PCBarr[i].runEnd = System.nanoTime();
 			MemoryDump.MemDump(disk, mgr, i, PCBarr[i]);
+			PCBarr[i].ComputeTime();
 			//System.out.println();
 		}
 		
 		CoreDump(PCBarr, disk);
 		
-		/*for (int i=0; i<30; i++)
+		for (int i=0; i<30; i++)
 		{
 			avgWaitTime += PCBarr[i].waitTime;
 			avgRunTime += PCBarr[i].runTime;
 		}
 		avgWaitTime /= 30;
 		avgRunTime /= 30;
-		*/
+		
+		System.out.println("Average time on disk = " + avgWaitTime + "ns");
+		System.out.println("Average time on CPU = " + avgRunTime + "ns");
 		
 		// TODO Add remaining driver code
 		
