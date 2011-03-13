@@ -11,7 +11,6 @@ public class CPU implements Runnable{
 	
 	char[][] cache; // Interior CPU cache
 	int PC; // Program counter
-	int jobID, jobSize; // ID and code length for jobs
 	static int cpuNum; // Total number of CPUs created
 	int cpuID; // Unique ID for each CPU
 	int[] registerBank; // holds all registers for CPU
@@ -24,13 +23,12 @@ public class CPU implements Runnable{
 	int alpha, omega; // begin/end indices for memory usage
 	int[] changeIndex; // addresses of changes to memory
 	int numChange; // amount of changes
+	PCB p;
 	
 	public CPU(MemoryManager mgr)
 	{
 		cache = new char[72][8]; // 72 is maximum total length 
 		PC = -1;
-		jobID = -1;
-		jobSize = -1;
 		registerBank = new int[16];
 		dec = new Decode();
 		exe = new Execute(this, mgr);
@@ -42,15 +40,17 @@ public class CPU implements Runnable{
 	
 	public void run()
 	{
+		p.runStart = System.nanoTime();
 		numChange = 0;
 		changeIndex = new int[24];
 		//Dispatcher.threadMessage("working");
-		while (PC < jobSize)
+		while (PC < p.codeSize)
 		{
 			Fetch();
 			decodeInst = dec.DecodeInst(inst);
 			exe.ExecInst(decodeInst);
 		}
+		p.runEnd = System.nanoTime();
 		//System.out.println();
 	}
 	

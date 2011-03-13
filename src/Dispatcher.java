@@ -59,8 +59,9 @@ public class Dispatcher {
 			{
 				//threadMessage("CPU " + i + " is done");
 				doneIndex = i;
+				c[doneIndex].p.runEnd = System.nanoTime();
 				ShortTermLoader.DataSwap(mgr, c[doneIndex], 1);
-				MemoryDump.MemDump(sch.disk, mgr, p[(c[doneIndex].jobID-1)]);
+				MemoryDump.MemDump(sch.disk, mgr, c[doneIndex].p);
 				//System.out.println();
 				if (pcb < 29)
 				{
@@ -85,7 +86,7 @@ public class Dispatcher {
 					//threadMessage("CPU " + i + " is done");
 					doneIndex = i;
 					ShortTermLoader.DataSwap(mgr, c[doneIndex], 1);
-					MemoryDump.MemDump(sch.disk, mgr, p[(c[doneIndex].jobID-1)]);
+					MemoryDump.MemDump(sch.disk, mgr, c[doneIndex].p);
 					CPUDone = true;
 				}
 			}
@@ -101,18 +102,18 @@ public class Dispatcher {
 	 */
 	private void LoadData(CPU comp, PCB p, int index, int i) throws InterruptedException
 	{
+		p.readyEnd = System.nanoTime();
 		comp.PC = 0;
 		for (int j=0; j<16; j++)
 			comp.registerBank[j]=p.registerBank[j];
-		comp.jobSize = p.codeSize;
-		comp.totalSize = p.totalSize;
-		comp.jobID = p.jobID;
+		comp.p = p;
 		comp.alpha = index;
 		comp.omega = comp.alpha + comp.totalSize;
 		ShortTermLoader.DataSwap(mgr, comp, 0);
 		t[i] = new Thread(comp);
 		//threadMessage("Starting CPU " + i);
         t[i].start();
+        p.runStart = System.nanoTime();
 	}
 	
 }

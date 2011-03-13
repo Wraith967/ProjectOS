@@ -21,8 +21,15 @@ public class PCB {
 	int totalSize;
 	int[] registerBank = new int[16];
 	
-	double waitTime; // Length of time job has waited on disk
-	double runTime; // Length of time job was on CPU
+	long waitTime; // Length of time job has waited on disk
+	long runTime; // Length of time job was on CPU
+	long readyTime; // Length of time on ready queue
+	long diskStart;
+	long diskEnd;
+	long runStart;
+	long runEnd;
+	long readyStart;
+	long readyEnd;
 	
 	// TODO Add remaining PCB attributes
 	
@@ -45,6 +52,13 @@ public class PCB {
 		totalSize = codeSize + inputBuffer + outputBuffer + tempBuffer;
 		for (int i=0; i<16; i++)
 			registerBank[i]=0;
+	}
+	
+	public void ComputeTime()
+	{
+		waitTime = diskEnd - diskStart;
+		runTime = runEnd - runStart;
+		readyTime = readyEnd - readyStart;
 	}
 
 }

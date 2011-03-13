@@ -25,8 +25,8 @@ public class OSDriver {
 		char[][] disk = new char[2048][8]; // holds all instructions as 8 chars
 		PCB[] PCBarr = new PCB[30];
 		int[] readyQueue = new int[14];
-		//int totalCode = 0;
-		//double avgWaitTime=0.0, avgRunTime=0.0;
+		long avgWaitTime=0, avgRunTime=0, avgReadyTime=0;
+		long totalRunTime, runStart, runEnd;
 		
 		for (int i=0; i<30; i++)
 			PCBarr[i] = new PCB();
@@ -41,27 +41,29 @@ public class OSDriver {
 			comp[i] = new CPU(mgr);
 		
 		//Method Calls
+		runStart = System.nanoTime();
 		control.runLoad(disk, "DataFile2.txt", PCBarr); // reads in datafile
 		sched.LoadMulti(readyQueue, PCBarr);
 		disp.MultiDispatch(comp, PCBarr, readyQueue);
-//		for (int i=0; i<30; i++)
-//		{
-//			sched.LoadJob(comp[0], PCBarr[i], disk);
-//			disp.LoadData(comp[0], PCBarr[i]);
-//			comp[0].runJob();
-//			MemoryDump.MemDump(disk, mgr, i, PCBarr[i]);
-//			System.out.println();
-//		}
+		runEnd = System.nanoTime();
 		CoreDump(PCBarr, disk);
-//		for (int i=0; i<totalCode; i++)
-//			System.out.println(disk[i]);
-//		for (int i=0; i<30; i++)
-//		{
-//			avgWaitTime += PCBarr[i].waitTime;
-//			avgRunTime += PCBarr[i].runTime;
-//		}
-//		avgWaitTime /= 30;
-//		avgRunTime /= 30;
+		totalRunTime = runEnd - runStart;
+
+		for (int i=0; i<30; i++)
+		{
+			PCBarr[i].ComputeTime();
+			avgWaitTime += PCBarr[i].waitTime;
+			avgRunTime += PCBarr[i].runTime;
+			avgReadyTime += PCBarr[i].readyTime;
+		}
+		avgWaitTime /= 30;
+		avgRunTime /= 30;
+		avgReadyTime /= 30;
+		
+		System.out.println("Average time on disk = " + avgWaitTime + "ns");
+		System.out.println("Average time on CPU = " + avgRunTime + "ns");
+		System.out.println("Average time in ready queue = " + avgReadyTime + "ns");
+		System.out.println("Total system time = " + totalRunTime + "ns");
 		
 		
 		// PC Cache size needed: 72 words		

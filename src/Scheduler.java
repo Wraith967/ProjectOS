@@ -38,24 +38,26 @@ public class Scheduler {
 	public void LoadMulti(int[] rq, PCB[] p)
 	{
 		dest = 0;
-			for (i=0; i<rq.length; i++)
+		for (i=0; i<rq.length; i++)
+		{
+			jobBegin = p[i].beginIndex;
+			if (jobBegin == -1)
 			{
-				jobBegin = p[i].beginIndex;
-				if (jobBegin == -1)
-				{
-					System.out.println("Invalid PCB");
-				}
-				else
-				{
-					rq[i] = dest;
-					p[i].base_Register = dest; // modify for m-scheduler later
-					for (j=0; j<p[i].totalSize; j++)
-					{
-						mgr.WriteInstruction(dest+j,disk[jobBegin+j]);
-					}
-					dest += 72;
-				}
+				System.out.println("Invalid PCB");
 			}
+			else
+			{
+				p[i].diskEnd = System.nanoTime();
+				rq[i] = dest;
+				p[i].base_Register = dest; // modify for m-scheduler later
+				for (j=0; j<p[i].totalSize; j++)
+				{
+					mgr.WriteInstruction(dest+j,disk[jobBegin+j]);
+				}
+				dest += 72;
+				p[i].readyStart = System.nanoTime();
+			}
+		}
 	}
 	
 	/**
@@ -68,6 +70,7 @@ public class Scheduler {
 	public void LoadSingle(int[] rq, PCB p, int index)
 	{
 		//Dispatcher.threadMessage("LoadSingle" + index);
+		p.diskEnd = System.nanoTime();
 		jobBegin = p.beginIndex;
 		if (jobBegin == -1)
 		{
@@ -78,32 +81,7 @@ public class Scheduler {
 			p.base_Register = rq[index];
 			for (i=0; i<p.totalSize; i++)
 				mgr.WriteInstruction(rq[index] + i, disk[jobBegin+i]);
+			p.readyStart = System.nanoTime();
 		}
-	}
-	
-	/**
-	 * 
-	 * @param jobId -- number of job from PCB
-	 * @param comp -- which computer is running job
-	 */
-	public void LoadJob(CPU comp, PCB p)
-	{
-		jobBegin = p.beginIndex;
-		if (jobBegin == -1)
-		{
-			System.out.println("Invalid PCB");
-		}
-		else
-		{
-			p.base_Register = 0; // modify for m-scheduler later
-			p.cpuID = comp.cpuID;
-			comp.jobID = p.jobID;
-			dest = EffectiveAddress.DirectAddress(jobBegin*4, 0);
-			for (i=0; i<p.totalSize; i++)
-			{
-				mgr.WriteInstruction(dest+i,disk[jobBegin+i]);
-			}
-		}
-	}
-	
+	}	
 }
