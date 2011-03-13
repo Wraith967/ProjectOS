@@ -19,7 +19,7 @@ public class CPU implements Runnable{
 	char[] inst; // array for each instruction
 	MemoryManager mgr; // for access to memory
 	int[] decodeInst; // array for decoded instruction
-	int totalSize; // for debug purposes
+	
 	int alpha, omega; // begin/end indices for memory usage
 	int[] changeIndex; // addresses of changes to memory
 	int numChange; // amount of changes

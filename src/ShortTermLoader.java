@@ -21,7 +21,7 @@ public class ShortTermLoader {
 		//Dispatcher.threadMessage("DataSwap " + direction);
 		if (direction == 0)
 		{
-			for (int i=0; i<pc.totalSize; i++)
+			for (int i=0; i<pc.p.totalSize; i++)
 			{
 				pc.cache[i] = mgr.ReadInstruction(pc.alpha + i).clone();
 			}

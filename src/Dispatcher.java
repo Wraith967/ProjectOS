@@ -108,12 +108,11 @@ public class Dispatcher {
 			comp.registerBank[j]=p.registerBank[j];
 		comp.p = p;
 		comp.alpha = index;
-		comp.omega = comp.alpha + comp.totalSize;
+		comp.omega = comp.alpha + p.totalSize;
 		ShortTermLoader.DataSwap(mgr, comp, 0);
 		t[i] = new Thread(comp);
 		//threadMessage("Starting CPU " + i);
         t[i].start();
-        p.runStart = System.nanoTime();
 	}
 	
 }
