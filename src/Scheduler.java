@@ -12,15 +12,13 @@ public class Scheduler {
 	 * I made this just so I can use it in OSDriver
 	 */
 	MemoryManager mgr;
-	int jobSize, jobBegin, buffer[], i, totalBuffer;
+	int jobBegin;
 	
 	public Scheduler(MemoryManager mgr)
 	{
 		this.mgr = mgr;
-		jobSize = -1;
+		
 		jobBegin = -1;
-		buffer = new int[3];
-		i = -1;
 	}
 	
 	/**
@@ -30,33 +28,21 @@ public class Scheduler {
 	 */
 	public void LoadJob(int jobId, CPU comp, PCB p, char[][] disk)
 	{
-		jobSize = p.codeSize;
+		
 		jobBegin = p.beginIndex;
-		if ((jobSize == -1) || (jobBegin == -1))
+		if (jobBegin == -1)
 		{
 			System.out.println("Invalid PCB");
 		}
 		else
 		{
-			buffer[0] = p.inputBuffer;
-			buffer[1] = p.outputBuffer;
-			buffer[2] = p.tempBuffer;
-			totalBuffer = buffer[0]+buffer[1]+buffer[2];
 			p.base_Register = 0; // modify for m-scheduler later
 			p.cpuID = comp.cpuID;
 			comp.jobID = jobId;
-			for (i=0; i<jobSize; i++)
+			for (int i=0; i<p.totalSize; i++)
 			{
 				mgr.WriteInstruction(i,disk[jobBegin+i]);
 			}
-			for (i=0; i<totalBuffer; i++)
-			{
-				mgr.WriteInstruction(jobSize+i, disk[jobBegin+jobSize+i]);
-			}
-			/*for (i=0; i<jobSize; i++)
-			{
-				comp.cache[i] = mgr.ReadInstruction(i);
-			}*/
 		}
 	}
 	

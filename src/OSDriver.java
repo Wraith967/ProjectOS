@@ -1,3 +1,5 @@
+import java.io.BufferedWriter;
+import java.io.FileWriter;
 import java.io.IOException;
 
 /**
@@ -7,7 +9,7 @@ import java.io.IOException;
 /**
  * @author Ben
  * Created: 2/9/2011
- * Last Edit: 2/23/2011
+ * Last Edit: 3/13/2011
  */
 
 
@@ -42,14 +44,10 @@ public class OSDriver {
 			disp.LoadData(i, comp, PCBarr[i]);
 			comp.runJob();
 			MemoryDump.MemDump(disk, mgr, i, PCBarr[i]);
-			System.out.println();
+			//System.out.println();
 		}
-		for (int i=0; i<30; i++)
-		{
-			for (int j=0; j<PCBarr[i].totalSize; j++)
-				System.out.println(disk[PCBarr[i].beginIndex+j]);
-			System.out.println();
-		}
+		
+		CoreDump(PCBarr, disk);
 		
 		/*for (int i=0; i<30; i++)
 		{
@@ -64,5 +62,17 @@ public class OSDriver {
 		
 		
 		// PC Cache size needed: 72 words		
+	}
+	
+	private static void CoreDump(PCB[] p, char[][] disk) throws IOException
+	{
+	BufferedWriter outputStream = new BufferedWriter(new FileWriter("outputPartI.txt"));
+	for (int i=0; i<30; i++)
+	for (int j=0; j<p[i].totalSize; j++)
+	{
+	outputStream.write(disk[p[i].beginIndex+j]);
+	outputStream.newLine();
+	}
+	outputStream.close();
 	}
 }

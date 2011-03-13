@@ -23,7 +23,7 @@ public class CPU {
 	int[] tempBuffer; // holds values of job temporary buffers
 	MemoryManager mgr;
 	int[] decodeInst;
-	int bufferSize; // for debug purposes
+	int totalSize; // for debug purposes
 	
 	public CPU(MemoryManager mgr)
 	{
