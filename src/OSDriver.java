@@ -25,6 +25,7 @@ public class OSDriver {
 		char[][] disk = new char[2048][8]; // holds all instructions as 8 chars
 		PCB[] PCBarr = new PCB[30];
 		long avgWaitTime=0, avgRunTime=0;
+		long totalRunTime, runStart, runEnd;
 		
 		for (int i=0; i<30; i++)
 			PCBarr[i] = new PCB();
@@ -37,6 +38,7 @@ public class OSDriver {
 		CPU comp = new CPU(mgr); // handles processing
 		
 		//Method Calls
+		runStart = System.nanoTime();
 		control.runLoad(disk, "DataFile2.txt", PCBarr); // reads in datafile
 		for (int i=0; i<30; i++)
 		{
@@ -45,14 +47,15 @@ public class OSDriver {
 			comp.runJob();
 			PCBarr[i].runEnd = System.nanoTime();
 			MemoryDump.MemDump(disk, mgr, i, PCBarr[i]);
-			PCBarr[i].ComputeTime();
 			//System.out.println();
 		}
-		
+		runEnd = System.nanoTime();
+		totalRunTime = runEnd - runStart;
 		CoreDump(PCBarr, disk);
 		
 		for (int i=0; i<30; i++)
 		{
+			PCBarr[i].ComputeTime();
 			avgWaitTime += PCBarr[i].waitTime;
 			avgRunTime += PCBarr[i].runTime;
 		}
@@ -61,6 +64,7 @@ public class OSDriver {
 		
 		System.out.println("Average time on disk = " + avgWaitTime + "ns");
 		System.out.println("Average time on CPU = " + avgRunTime + "ns");
+		System.out.println("Total system time = " + totalRunTime + "ns");
 		
 		// TODO Add remaining driver code
 		
