@@ -69,7 +69,7 @@ public class OSDriver {
 	
 	private static void CoreDump(PCB[] p, char[][] disk) throws IOException
 	{
-		BufferedWriter outputStream = new BufferedWriter(new FileWriter("output.txt"));
+		BufferedWriter outputStream = new BufferedWriter(new FileWriter("outputPartII.txt"));
 		for (int i=0; i<30; i++)
 			for (int j=0; j<p[i].totalSize; j++)
 			{
