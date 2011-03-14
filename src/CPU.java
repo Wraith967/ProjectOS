@@ -5,32 +5,30 @@
 /**
  * @author Ben
  * Created: 2/10/2011
- * Last Edit: 3/3/2011
+ * Last Edit: 3/8/2011
  */
-public class CPU {
+public class CPU implements Runnable{
 	
 	char[][] cache; // Interior CPU cache
 	int PC; // Program counter
-	int jobID, jobSize; // ID and code length for jobs
 	static int cpuNum; // Total number of CPUs created
 	int cpuID; // Unique ID for each CPU
 	int[] registerBank; // holds all registers for CPU
 	Decode dec; // decodes instructions
 	Execute exe; // performs instructions
 	char[] inst; // array for each instruction
-	int[] inputBuffer; // holds values of job input buffers
-	int[] outputBuffer; // holds values of job output buffers
-	int[] tempBuffer; // holds values of job temporary buffers
-	MemoryManager mgr;
-	int[] decodeInst;
-	int totalSize; // for debug purposes
+	MemoryManager mgr; // for access to memory
+	int[] decodeInst; // array for decoded instruction
+	
+	int alpha, omega; // begin/end indices for memory usage
+	int[] changeIndex; // addresses of changes to memory
+	int numChange; // amount of changes
+	PCB p;
 	
 	public CPU(MemoryManager mgr)
 	{
-		cache = new char[28][8]; // 28 is maximum instruction length 
+		cache = new char[72][8]; // 72 is maximum total length 
 		PC = -1;
-		jobID = -1;
-		jobSize = -1;
 		registerBank = new int[16];
 		dec = new Decode();
 		exe = new Execute(this, mgr);
@@ -40,20 +38,25 @@ public class CPU {
 		decodeInst = new int[5];
 	}
 	
-	public void runJob()
+	public void run()
 	{
-		while (PC < jobSize)
+		p.runStart = System.nanoTime();
+		numChange = 0;
+		changeIndex = new int[24];
+		//Dispatcher.threadMessage("working");
+		while (PC < p.codeSize)
 		{
 			Fetch();
 			decodeInst = dec.DecodeInst(inst);
 			exe.ExecInst(decodeInst);
 		}
+		p.runEnd = System.nanoTime();
 		//System.out.println();
 	}
 	
 	public void Fetch()
 	{
-		inst = mgr.ReadInstruction(PC++);
+		inst = cache[PC++];
 		//System.out.println(inst);
 	}
 	

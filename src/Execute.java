@@ -5,7 +5,7 @@
 /**
  * @author Ben
  * Created: 2/17/2011
- * Last Edit: 3/3/2011
+ * Last Edit: 3/8/2011
  */
 public class Execute {
 	
@@ -21,7 +21,7 @@ public class Execute {
 		pc = c;
 		mgr = m;
 		inst = new char[8];
-		dm = new DMAChannel(m);
+		dm = new DMAChannel(m, c);
 	}
 	
 	/**
@@ -64,9 +64,15 @@ public class Execute {
 			for (j=0; j<hexArr.length; j++)
 				inst[i+j] = hexArr[j];
 			if (c[4]==0)
+			{
 				dm.Write(0, pc.registerBank[c[3]], inst.clone());
+				pc.changeIndex[pc.numChange++] = EffectiveAddress.DirectAddress(0,pc.registerBank[c[3]]);
+			}
 			else
+			{
 				dm.Write(0, c[4], inst.clone());
+				pc.changeIndex[pc.numChange++] = EffectiveAddress.DirectAddress(0,c[4]);
+			}
 			break;
 		case 2:
 			//System.out.println("ST" + " " + c[2] + " " + c[3] + " " + c[4]);
@@ -78,6 +84,7 @@ public class Execute {
 			for (j=0; j<hexArr.length; j++)
 				inst[i+j] = hexArr[j];
 			dm.Write(0, pc.registerBank[c[3]], inst.clone());
+			pc.changeIndex[pc.numChange++] = EffectiveAddress.DirectAddress(0,pc.registerBank[c[3]]);
 			break;
 		case 3:
 			//System.out.println("LW" + " " + c[2] + " " + c[3] + " " + c[4]);
@@ -158,7 +165,7 @@ public class Execute {
 			break;
 		case 18:
 			//System.out.println("HLT" + " " + c[2] + " " + c[3] + " " + c[4]);
-			pc.PC = pc.jobSize; // Force PC to end of job
+			pc.PC = pc.p.codeSize; // Force PC to end of job
 			break;
 		case 20:
 			//System.out.println("JMP" + " " + c[2] + " " + c[3] + " " + c[4]);

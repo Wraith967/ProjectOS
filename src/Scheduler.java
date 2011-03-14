@@ -5,30 +5,71 @@
 /**
  * @author Ben
  * Created: 2/10/2011
- * Last Edit: 2/23/2011
+ * Last Edit: 3/8/2011
  */
 public class Scheduler {
-	/** TODO Create this class
-	 * I made this just so I can use it in OSDriver
-	 */
-	MemoryManager mgr;
-	int jobBegin;
 	
-	public Scheduler(MemoryManager mgr)
+	MemoryManager mgr;
+	/**
+	 * jobBegin = beginning index of a job in disk
+	 * i,j = indices
+	 * dest = used to find actual address for memory
+	 */
+	int jobBegin, i, j, dest;
+	char[][] disk;
+	
+	public Scheduler(MemoryManager mgr, char[][] disk)
 	{
 		this.mgr = mgr;
-		
 		jobBegin = -1;
+		i = -1;
+		j = -1;
+		dest = -1;
+		this.disk = disk;
 	}
 	
 	/**
 	 * 
-	 * @param jobId -- number of job from PCB
-	 * @param comp -- which computer is running job
+	 * @param rq
+	 * @param p
+	 * @param disk
 	 */
-	public void LoadJob(int jobId, CPU comp, PCB p, char[][] disk)
+	public void LoadMulti(int[] rq, PCB[] p)
 	{
-		
+		dest = 0;
+		for (i=0; i<rq.length; i++)
+		{
+			jobBegin = p[i].beginIndex;
+			if (jobBegin == -1)
+			{
+				System.out.println("Invalid PCB");
+			}
+			else
+			{
+				p[i].diskEnd = System.nanoTime();
+				rq[i] = dest;
+				p[i].base_Register = dest; // modify for m-scheduler later
+				for (j=0; j<p[i].totalSize; j++)
+				{
+					mgr.WriteInstruction(dest+j,disk[jobBegin+j]);
+				}
+				dest += 72;
+				p[i].readyStart = System.nanoTime();
+			}
+		}
+	}
+	
+	/**
+	 * 
+	 * @param rq
+	 * @param p
+	 * @param disk
+	 * @param index
+	 */
+	public void LoadSingle(int[] rq, PCB p, int index)
+	{
+		//Dispatcher.threadMessage("LoadSingle" + index);
+		p.diskEnd = System.nanoTime();
 		jobBegin = p.beginIndex;
 		if (jobBegin == -1)
 		{
@@ -36,16 +77,10 @@ public class Scheduler {
 		}
 		else
 		{
-			p.diskEnd = System.nanoTime();
-			p.base_Register = 0; // modify for m-scheduler later
-			p.cpuID = comp.cpuID;
-			comp.jobID = jobId;
-			for (int i=0; i<p.totalSize; i++)
-			{
-				mgr.WriteInstruction(i,disk[jobBegin+i]);
-			}
-			p.runStart = System.nanoTime();
+			p.base_Register = rq[index];
+			for (i=0; i<p.totalSize; i++)
+				mgr.WriteInstruction(rq[index] + i, disk[jobBegin+i]);
+			p.readyStart = System.nanoTime();
 		}
-	}
-	
+	}	
 }
