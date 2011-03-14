@@ -14,7 +14,6 @@ public class Scheduler {
 	 * jobBegin = beginning index of a job in disk
 	 * i,j = indices
 	 * dest = used to find actual address for memory
-	 * index = similar to Program Counter for memory
 	 */
 	int jobBegin, i, j, dest;
 	char[][] disk;
