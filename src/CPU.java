@@ -19,19 +19,18 @@ public class CPU implements Runnable{
 	char[] inst; // array for each instruction
 	MemoryManager mgr; // for access to memory
 	int[] decodeInst; // array for decoded instruction
-	
 	int alpha, omega; // begin/end indices for memory usage
 	int[] changeIndex; // addresses of changes to memory
 	int numChange; // amount of changes
 	PCB p;
 	
-	public CPU(MemoryManager mgr)
+	public CPU(MemoryManager mgr, DMAChannel dm)
 	{
 		cache = new char[72][8]; // 72 is maximum total length 
 		PC = -1;
 		registerBank = new int[16];
 		dec = new Decode();
-		exe = new Execute(this, mgr);
+		exe = new Execute(this, mgr, dm);
 		inst = new char[8];
 		this.mgr = mgr;
 		cpuID = cpuNum++;
@@ -40,24 +39,18 @@ public class CPU implements Runnable{
 	
 	public void run()
 	{
+		exe.count = 0;
 		p.runStart = System.nanoTime();
 		numChange = 0;
 		changeIndex = new int[24];
 		//Dispatcher.threadMessage("working");
 		while (PC < p.codeSize)
 		{
-			Fetch();
+			inst = cache[PC++];
 			decodeInst = dec.DecodeInst(inst);
 			exe.ExecInst(decodeInst);
 		}
 		p.runEnd = System.nanoTime();
-		//System.out.println();
-	}
-	
-	public void Fetch()
-	{
-		inst = cache[PC++];
-		//System.out.println(inst);
-	}
-	
+		p.IOcount = exe.count;
+	}	
 }

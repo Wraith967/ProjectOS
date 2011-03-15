@@ -17,8 +17,9 @@ public class Scheduler {
 	 */
 	int jobBegin, i, j, dest;
 	char[][] disk;
+	PCB[] p;
 	
-	public Scheduler(MemoryManager mgr, char[][] disk)
+	public Scheduler(MemoryManager mgr, char[][] disk, PCB[] p)
 	{
 		this.mgr = mgr;
 		jobBegin = -1;
@@ -26,6 +27,7 @@ public class Scheduler {
 		j = -1;
 		dest = -1;
 		this.disk = disk;
+		this.p = p;
 	}
 	
 	/**
@@ -34,7 +36,7 @@ public class Scheduler {
 	 * @param p
 	 * @param disk
 	 */
-	public void LoadMulti(int[] rq, PCB[] p)
+	public void LoadMulti(int[] rq)
 	{
 		dest = 0;
 		for (i=0; i<rq.length; i++)
@@ -82,5 +84,5 @@ public class Scheduler {
 				mgr.WriteInstruction(rq[index] + i, disk[jobBegin+i]);
 			p.readyStart = System.nanoTime();
 		}
-	}	
+	}
 }

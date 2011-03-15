@@ -18,7 +18,8 @@ public class PCB {
 	int tempBuffer; // Size of temporary buffer
 	int beginIndex; // Index of first instruction in disk
 	int base_Register; // Index of first instruction in memory
-	int totalSize;
+	int totalSize; // Total job space required
+	int IOcount; // Number of I/O requests made
 	int[] registerBank = new int[16];
 	
 	long waitTime; // Length of time job has waited on disk

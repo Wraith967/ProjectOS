@@ -11,17 +11,19 @@ public class Execute {
 	
 	CPU pc;
 	MemoryManager mgr;
+	DMAChannel dm;
 	char[] inst, hexArr;
 	String hex; 
 	int sum, power, i, j;
-	DMAChannel dm;
+	int count; // number of I/O requests per job
 	
-	public Execute(CPU c, MemoryManager m)
+	public Execute(CPU c, MemoryManager m, DMAChannel dm)
 	{
 		pc = c;
 		mgr = m;
 		inst = new char[8];
-		dm = new DMAChannel(m, c);
+		this.dm = dm;
+		count = 0;
 	}
 	
 	/**
@@ -38,11 +40,12 @@ public class Execute {
 		{
 		case 0:
 			//System.out.println("RD" + " " + c[2] + " " + c[3] + " " + c[4]);
+			count++;
 			sum = 0;
 			if (c[4] == 0)
-				inst = dm.Read(0, pc.registerBank[c[3]]);
+				inst = dm.Read(0, pc.registerBank[c[3]], pc);
 			else
-				inst = dm.Read(0, c[4]);
+				inst = dm.Read(0, c[4], pc);
 			for (i=0; i<8; i++)
 			{
 				power = 1;
@@ -56,6 +59,7 @@ public class Execute {
 			break;
 		case 1:
 			//System.out.println("WR" + " " + c[2] + " " + c[3] + " " + c[4]);
+			count++;
 			hex = Integer.toHexString(pc.registerBank[c[2]]);
 			hex = hex.toUpperCase();
 			hexArr = hex.toCharArray();
@@ -65,17 +69,18 @@ public class Execute {
 				inst[i+j] = hexArr[j];
 			if (c[4]==0)
 			{
-				dm.Write(0, pc.registerBank[c[3]], inst.clone());
+				dm.Write(0, pc.registerBank[c[3]], inst.clone(), pc);
 				pc.changeIndex[pc.numChange++] = EffectiveAddress.DirectAddress(0,pc.registerBank[c[3]]);
 			}
 			else
 			{
-				dm.Write(0, c[4], inst.clone());
+				dm.Write(0, c[4], inst.clone(), pc);
 				pc.changeIndex[pc.numChange++] = EffectiveAddress.DirectAddress(0,c[4]);
 			}
 			break;
 		case 2:
 			//System.out.println("ST" + " " + c[2] + " " + c[3] + " " + c[4]);
+			count++;
 			hex = Integer.toHexString(pc.registerBank[c[2]]);
 			hex = hex.toUpperCase();
 			hexArr = hex.toCharArray();
@@ -83,13 +88,14 @@ public class Execute {
 				inst[i] = '0';
 			for (j=0; j<hexArr.length; j++)
 				inst[i+j] = hexArr[j];
-			dm.Write(0, pc.registerBank[c[3]], inst.clone());
+			dm.Write(0, pc.registerBank[c[3]], inst.clone(), pc);
 			pc.changeIndex[pc.numChange++] = EffectiveAddress.DirectAddress(0,pc.registerBank[c[3]]);
 			break;
 		case 3:
 			//System.out.println("LW" + " " + c[2] + " " + c[3] + " " + c[4]);
+			count++;
 			sum = 0;
-			inst = dm.Read(c[4], pc.registerBank[c[2]]);
+			inst = dm.Read(c[4], pc.registerBank[c[2]], pc);
 			for (i=0; i<8; i++)
 			{
 				power = 1;
