@@ -24,9 +24,9 @@ public class OSDriver {
 		//Data
 		char[][] disk = new char[2048][8]; // holds all instructions as 8 chars
 		PCB[] PCBarr = new PCB[30];
-		int[] readyQueue = new int[14];
+		int[] readyQueue = new int[15];
 		long avgWaitTime=0, avgRunTime=0, avgReadyTime=0;
-		//long totalRunTime, runStart, runEnd;
+		long totalRunTime, runStart, runEnd;
 		
 		for (int i=0; i<30; i++)
 			PCBarr[i] = new PCB();
@@ -35,20 +35,23 @@ public class OSDriver {
 		Loader control = new Loader(); // handles reading in and parsing of all instructions
 		MemoryManager mgr = new MemoryManager(); // handles RAM
 		DMAChannel dm = new DMAChannel(); // handles I/O requests
-		Scheduler sched = new Scheduler(mgr, disk, PCBarr); // moves job to CPU
-		Dispatcher disp = new Dispatcher(mgr, sched); // moves job data to CPU
+		Scheduler sched = new Scheduler(mgr, disk, PCBarr, readyQueue); // moves job to CPU
 		CPU[] comp = new CPU[4]; // handles processing
 		for (int i=0; i<4; i++)
 			comp[i] = new CPU(mgr, dm);
+		Dispatcher disp = new Dispatcher(mgr, sched, comp, PCBarr, readyQueue); // moves job data to CPU
 		
 		//Method Calls
-		//runStart = System.nanoTime();
+		runStart = System.nanoTime();
 		control.runLoad(disk, "DataFile2.txt", PCBarr); // reads in datafile
-		sched.LoadMulti(readyQueue);
-		disp.MultiDispatch(comp, PCBarr, readyQueue);
-		//runEnd = System.nanoTime();
+		for (int i=0; i<2; i++)
+		{
+			sched.LoadMulti(i);
+			disp.MultiDispatch();
+		}
+		runEnd = System.nanoTime();
 		CoreDump(PCBarr, disk);
-		//totalRunTime = runEnd - runStart;
+		totalRunTime = runEnd - runStart;
 
 		for (int i=0; i<30; i++)
 		{
@@ -61,10 +64,10 @@ public class OSDriver {
 		avgWaitTime /= 30;
 		avgRunTime /= 30;
 		avgReadyTime /= 30;
-		//System.out.println("Average time on disk = " + avgWaitTime + "ns");
-		//System.out.println("Average time on CPU = " + avgRunTime + "ns");
-		//System.out.println("Average time in ready queue = " + avgReadyTime + "ns");
-		//System.out.println("Total system time = " + totalRunTime + "ns");
+		System.out.println("Average time on disk = " + avgWaitTime + "ns");
+		System.out.println("Average time on CPU = " + avgRunTime + "ns");
+		System.out.println("Average time in ready queue = " + avgReadyTime + "ns");
+		System.out.println("Total system time = " + totalRunTime + "ns");
 		
 		
 		// PC Cache size needed: 72 words		

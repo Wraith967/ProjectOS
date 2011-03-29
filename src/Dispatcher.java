@@ -20,23 +20,27 @@ public class Dispatcher {
 	
 	MemoryManager mgr;
 	Scheduler sch;
-	int pcb; // index for PCBs
 	int readyIndex; // index for ready queue
 	Thread[] t; // runs CPUs as threads
 	boolean isDone; // checks for completion of application
 	boolean CPUDone;
 	int doneIndex; // index of finished CPU
-	int i;
+	int i, j;
+	CPU[] c;
+	PCB[] p;
+	int[] rq;
 	
-	public Dispatcher(MemoryManager mgr, Scheduler sch)
+	public Dispatcher(MemoryManager mgr, Scheduler sch, CPU[] c, PCB[] p, int[] rq)
 	{
 		this.mgr = mgr;
 		this.sch = sch;
 		t = new Thread[4];
 		isDone = false;
-		pcb = -1;
 		readyIndex = 0;
 		CPUDone = false;
+		this.c = c;
+		this.p = p;
+		this.rq = rq;
 	}
 	
 	/**
@@ -45,11 +49,16 @@ public class Dispatcher {
 	 * @param p
 	 * @param rq
 	 */
-	public void MultiDispatch(CPU[] c, PCB[] p, int[] rq) throws InterruptedException
+	public void MultiDispatch() throws InterruptedException
 	{
+		j=0;
+		isDone = false;
+		readyIndex = 0;
+		CPUDone = false;
 		for (int i=0; i<4; i++)
 		{
-			LoadData(c[i], p[++pcb], rq[readyIndex++], i);
+			LoadData(c[i], p[rq[readyIndex++]-1], i);
+			j++;
 		}
 		// TODO Add watch code on CPUs
 		i = 0;
@@ -62,12 +71,10 @@ public class Dispatcher {
 				c[doneIndex].p.runEnd = System.nanoTime();
 				ShortTermLoader.DataSwap(mgr, c[doneIndex], 1);
 				MemoryDump.MemDump(sch.disk, mgr, c[doneIndex].p);
-				//System.out.println();
-				if (pcb < 29)
+				if (j<15)
 				{
-					sch.LoadSingle(rq, p[++pcb], (readyIndex));
-					LoadData(c[doneIndex], p[pcb], rq[readyIndex++], doneIndex);
-					readyIndex %= 14;
+					LoadData(c[doneIndex], p[rq[readyIndex++]-1], doneIndex);
+					j++;
 				}
 				else
 				{
@@ -100,14 +107,14 @@ public class Dispatcher {
 	 * @param p
 	 * @param index
 	 */
-	private void LoadData(CPU comp, PCB p, int index, int i) throws InterruptedException
+	private void LoadData(CPU comp, PCB p, int i) throws InterruptedException
 	{
 		p.readyEnd = System.nanoTime();
 		comp.PC = 0;
 		for (int j=0; j<16; j++)
 			comp.registerBank[j]=p.registerBank[j];
 		comp.p = p;
-		comp.alpha = index;
+		comp.alpha = p.base_Register;
 		comp.omega = comp.alpha + p.totalSize;
 		ShortTermLoader.DataSwap(mgr, comp, 0);
 		t[i] = new Thread(comp);
