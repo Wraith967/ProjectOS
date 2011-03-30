@@ -53,7 +53,6 @@ public class Scheduler {
 			}
 			else
 			{
-				p[k].diskEnd = System.nanoTime();
 				rq[i] = p[k].jobID;
 				p[k].base_Register = dest; // modify for m-scheduler later
 				for (int j=0; j<p[k].totalSize; j++)

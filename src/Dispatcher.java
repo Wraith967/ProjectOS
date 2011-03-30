@@ -21,7 +21,6 @@ public class Dispatcher {
 	MemoryManager mgr;
 	Scheduler sch;
 	int readyIndex; // index for ready queue
-	Thread[] t; // runs CPUs as threads
 	boolean isDone; // checks for completion of application
 	boolean CPUDone;
 	int doneIndex; // index of finished CPU
@@ -34,7 +33,6 @@ public class Dispatcher {
 	{
 		this.mgr = mgr;
 		this.sch = sch;
-		t = new Thread[4];
 		isDone = false;
 		readyIndex = 0;
 		CPUDone = false;
@@ -64,7 +62,7 @@ public class Dispatcher {
 		i = 0;
 		while (!isDone)
 		{
-			if (!t[i].isAlive())
+			if (!c[i].t.isAlive())
 			{
 				//threadMessage("CPU " + i + " is done");
 				doneIndex = i;
@@ -88,7 +86,7 @@ public class Dispatcher {
 		{
 			while (!CPUDone)
 			{
-				if (!t[i].isAlive())
+				if (!c[i].t.isAlive())
 				{
 					//threadMessage("CPU " + i + " is done");
 					doneIndex = i;
@@ -115,8 +113,8 @@ public class Dispatcher {
 		comp.alpha = p.base_Register;
 		comp.omega = comp.alpha + p.totalSize;
 		ShortTermLoader.DataSwap(mgr, comp, 0);
-		t[i] = new Thread(comp);
 		//threadMessage("Starting CPU " + i);
-        t[i].start();
+		comp.go();
+		
 	}
 }

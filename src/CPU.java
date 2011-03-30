@@ -19,6 +19,7 @@ public class CPU implements Runnable{
 	int[] decodeInst; // array for decoded instruction
 	int alpha, omega; // begin/end indices for memory usage
 	PCB p;
+	Thread t;
 	
 	public CPU(MemoryManager mgr, DMAChannel dm)
 	{
@@ -31,16 +32,23 @@ public class CPU implements Runnable{
 		decodeInst = new int[5];
 	}
 	
+	public void go()
+	{
+		t = new Thread(this);
+		t.start();
+	}
+	
 	public void run()
 	{
 		p.runStart = System.nanoTime();
-		//Dispatcher.threadMessage("working");
-		while (p.PC < p.codeSize)
+		Dispatcher.threadMessage("working");
+		while (true)
 		{
+			if (t.isInterrupted())
+				break;
 			inst = cache[p.PC++];
 			decodeInst = dec.DecodeInst(inst);
 			exe.ExecInst(decodeInst);
 		}
-		p.runEnd = System.nanoTime();
 	}	
 }

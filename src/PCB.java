@@ -25,11 +25,8 @@ public class PCB {
 	int[] changeIndex = new int[12]; // addresses of changes to memory
 	int numChange; // amount of changes
 	
-	long waitTime; // Length of time job has waited on disk
 	long runTime; // Length of time job was on CPU
 	long readyTime; // Length of time on ready queue
-	long diskStart;
-	long diskEnd;
 	long runStart;
 	long runEnd;
 	long readyStart;
@@ -60,7 +57,6 @@ public class PCB {
 	
 	public void ComputeTime()
 	{
-		waitTime = diskEnd - diskStart;
 		runTime = runEnd - runStart;
 		readyTime = readyEnd - readyStart;
 	}
