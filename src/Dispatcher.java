@@ -110,9 +110,7 @@ public class Dispatcher {
 	private void LoadData(CPU comp, PCB p, int i) throws InterruptedException
 	{
 		p.readyEnd = System.nanoTime();
-		comp.PC = 0;
-		for (int j=0; j<16; j++)
-			comp.registerBank[j]=p.registerBank[j];
+		p.PC = 0;
 		comp.p = p;
 		comp.alpha = p.base_Register;
 		comp.omega = comp.alpha + p.totalSize;

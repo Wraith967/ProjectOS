@@ -1,6 +1,7 @@
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Scanner;
 
 /**
  * 
@@ -27,6 +28,8 @@ public class OSDriver {
 		int[] readyQueue = new int[15];
 		long avgWaitTime=0, avgRunTime=0, avgReadyTime=0;
 		long totalRunTime, runStart, runEnd;
+		String input, output;
+		Scanner scan = new Scanner(System.in);
 		
 		for (int i=0; i<30; i++)
 			PCBarr[i] = new PCB();
@@ -42,15 +45,19 @@ public class OSDriver {
 		Dispatcher disp = new Dispatcher(mgr, sched, comp, PCBarr, readyQueue); // moves job data to CPU
 		
 		//Method Calls
+		System.out.println("Name of input file:");
+		input = scan.nextLine();
 		runStart = System.nanoTime();
-		control.runLoad(disk, "DataFile2.txt", PCBarr); // reads in datafile
+		control.runLoad(disk, input, PCBarr); // reads in datafile
 		for (int i=0; i<2; i++)
 		{
 			sched.LoadMulti(i);
 			disp.MultiDispatch();
 		}
 		runEnd = System.nanoTime();
-		CoreDump(PCBarr, disk);
+		System.out.println("Name of output file:");
+		output = scan.nextLine();
+		CoreDump(PCBarr, disk, output);
 		totalRunTime = runEnd - runStart;
 
 		for (int i=0; i<30; i++)
@@ -73,9 +80,9 @@ public class OSDriver {
 		// PC Cache size needed: 72 words		
 	}
 	
-	private static void CoreDump(PCB[] p, char[][] disk) throws IOException
+	private static void CoreDump(PCB[] p, char[][] disk, String output) throws IOException
 	{
-		BufferedWriter outputStream = new BufferedWriter(new FileWriter("outputPartII.txt"));
+		BufferedWriter outputStream = new BufferedWriter(new FileWriter(output));
 		for (int i=0; i<30; i++)
 			for (int j=0; j<p[i].totalSize; j++)
 			{

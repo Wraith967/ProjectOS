@@ -28,9 +28,9 @@ public class ShortTermLoader {
 		}
 		else
 		{
-			for (int i=0; i<pc.numChange; i++)
+			for (int i=0; i<pc.p.numChange; i++)
 			{
-				mgr.WriteInstruction(pc.alpha + pc.changeIndex[i], pc.cache[pc.changeIndex[i]].clone());
+				mgr.WriteInstruction(pc.alpha + pc.p.changeIndex[i], pc.cache[pc.p.changeIndex[i]].clone());
 			}
 		}
 		return true;

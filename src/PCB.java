@@ -9,6 +9,7 @@
  */
 public class PCB {
 	
+	int PC; // Program counter
 	int cpuID; // ID of CPU running a certain job
 	int jobID; // ID of a certain job
 	int codeSize; // Number of instructions in a job
@@ -19,8 +20,10 @@ public class PCB {
 	int beginIndex; // Index of first instruction in disk
 	int base_Register; // Index of first instruction in memory
 	int totalSize; // Total job space required
-	int IOcount; // Number of I/O requests made
+	int count; // Number of I/O requests made
 	int[] registerBank = new int[16];
+	int[] changeIndex = new int[12]; // addresses of changes to memory
+	int numChange; // amount of changes
 	
 	long waitTime; // Length of time job has waited on disk
 	long runTime; // Length of time job was on CPU
