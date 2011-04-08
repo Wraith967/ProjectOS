@@ -53,7 +53,6 @@ public class Scheduler {
 			}
 			else
 			{
-				p[k].diskEnd = System.nanoTime();
 				rq[i] = p[k].jobID;
 				p[k].base_Register = dest; // modify for m-scheduler later
 				for (int j=0; j<p[k].totalSize; j++)
@@ -112,6 +111,7 @@ public class Scheduler {
         // Main loop
         while( leftPos <= leftEnd && rightPos <= rightEnd )
             if( p[a[leftPos]-1].codeSize < p[a[rightPos]-1].codeSize  )
+           // if( p[a[leftPos]-1].priority < p[a[rightPos]-1].priority  )
                 tmpArray[ tmpPos++ ] = a[ leftPos++ ];
             else
                 tmpArray[ tmpPos++ ] = a[ rightPos++ ];

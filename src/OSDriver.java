@@ -1,7 +1,7 @@
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.Scanner;
+//import java.util.Scanner;
 
 /**
  * 
@@ -26,10 +26,10 @@ public class OSDriver {
 		char[][] disk = new char[2048][8]; // holds all instructions as 8 chars
 		PCB[] PCBarr = new PCB[30];
 		int[] readyQueue = new int[15];
-		long avgWaitTime=0, avgRunTime=0, avgReadyTime=0;
+		long avgRunTime=0, avgReadyTime=0;
 		long totalRunTime, runStart, runEnd;
-		String input, output;
-		Scanner scan = new Scanner(System.in);
+		String input="DataFile2.txt", output="output.txt";
+		//Scanner scan = new Scanner(System.in);
 		
 		for (int i=0; i<30; i++)
 			PCBarr[i] = new PCB();
@@ -45,8 +45,10 @@ public class OSDriver {
 		Dispatcher disp = new Dispatcher(mgr, sched, comp, PCBarr, readyQueue); // moves job data to CPU
 		
 		//Method Calls
-		System.out.println("Name of input file:");
-		input = scan.nextLine();
+//		System.out.println("Name of input file:");
+//		input = scan.nextLine();
+//		System.out.println("Name of output file:");
+//		output = scan.nextLine();
 		runStart = System.nanoTime();
 		control.runLoad(disk, input, PCBarr); // reads in datafile
 		for (int i=0; i<2; i++)
@@ -55,23 +57,20 @@ public class OSDriver {
 			disp.MultiDispatch();
 		}
 		runEnd = System.nanoTime();
-		System.out.println("Name of output file:");
-		output = scan.nextLine();
 		CoreDump(PCBarr, disk, output);
 		totalRunTime = runEnd - runStart;
 
 		for (int i=0; i<30; i++)
 		{
 			PCBarr[i].ComputeTime();
-			avgWaitTime += PCBarr[i].waitTime;
 			avgRunTime += PCBarr[i].runTime;
 			avgReadyTime += PCBarr[i].readyTime;
 			//System.out.println("Number of I/O for jobID: " + PCBarr[i].jobID + " = " + PCBarr[i].IOcount);
 		}
-		avgWaitTime /= 30;
+		
 		avgRunTime /= 30;
 		avgReadyTime /= 30;
-		System.out.println("Average time on disk = " + avgWaitTime + "ns");
+		
 		System.out.println("Average time on CPU = " + avgRunTime + "ns");
 		System.out.println("Average time in ready queue = " + avgReadyTime + "ns");
 		System.out.println("Total system time = " + totalRunTime + "ns");
