@@ -18,7 +18,7 @@ public class Loader {
 	String line; // input from buffer
 	int[] jobData; // parsed from input
 	String[] tokens; // used for non-instructions
-	int x, y; // index values: x for disk, y for PCB
+	int x, y, z; // index values: x for disk-page, y for PCB, z for interior page
 	Pattern pattern1;
 	Pattern pattern2;
 	Matcher matcher1;
@@ -28,6 +28,7 @@ public class Loader {
 		jobData = new int[3];
 		x = 0;
 		y = 0;
+		z = 0;
 		pattern1 = Pattern.compile("// JOB [0-9A-F]{1,2} [0-9A-F]{2} [0-9A-F]{1}");
 		pattern2 = Pattern.compile("// Data 14 C C");
 	}
@@ -38,7 +39,7 @@ public class Loader {
 	* @param text -- name of data file
 	* @throws IOException
 	*/
-	public void runLoad(char[][] arr, String text, PCB[] pArr) throws IOException
+	public int runLoad(char[][][] arr, String text, PCB[] pArr) throws IOException
 	{
 		//System.out.println(pattern1.toString());
 		//System.out.println(pattern2.toString());
@@ -49,9 +50,14 @@ public class Loader {
 			if (line.charAt(0) == '0') // checks for instruction
 			{
 				for (int i=0; i<8; i++)
-					arr[x][i] = line.charAt(i+2); // ignores "0x"
+					arr[x][z][i] = line.charAt(i+2); // ignores "0x"
 				//System.out.print(arr[x++]);
-				x++;
+				z++;
+				if (z==4)
+				{
+					z = 0;
+					x++;
+				}
 			}
 			else
 			{
@@ -80,15 +86,26 @@ public class Loader {
 					pArr[y].inputBuffer = jobData[0];
 					pArr[y].outputBuffer = jobData[1];
 					pArr[y].tempBuffer = jobData[2];
+					if (z>0)
+					{
+						z=0;
+						x++;
+					}
 				}
 				else
 				{
-					//System.out.println(pArr[y]);
+					System.out.println(pArr[y]);
 					pArr[y++].ComputeSize();
 					//System.out.println(pArr[y++].totalSize);
+					if (z>0)
+					{
+						z=0;
+						x++;
+					}
 				}
 			}
 		}
 		inputStream.close();
+		return x;
 	}
 }

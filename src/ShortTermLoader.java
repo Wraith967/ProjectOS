@@ -19,18 +19,21 @@ public class ShortTermLoader {
 	public static boolean DataSwap(MemoryManager mgr, CPU pc, int direction)
 	{
 		//Dispatcher.threadMessage("DataSwap " + direction);
+		
+		// TODO Modify DataSwap for frames
+		
 		if (direction == 0)
 		{
 			for (int i=0; i<pc.p.totalSize; i++)
 			{
-				pc.cache[i] = mgr.ReadInstruction(pc.alpha + i).clone();
+				pc.cache[i] = mgr.ReadFrame(pc.alpha + i).clone();
 			}
 		}
 		else
 		{
 			for (int i=0; i<pc.p.numChange; i++)
 			{
-				mgr.WriteInstruction(pc.alpha + pc.p.changeIndex[i], pc.cache[pc.p.changeIndex[i]].clone());
+				mgr.WriteFrame(pc.alpha + pc.p.changeIndex[i], pc.cache[pc.p.changeIndex[i]].clone());
 			}
 		}
 		return true;

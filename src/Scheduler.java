@@ -16,11 +16,12 @@ public class Scheduler {
 	 * dest = used to find actual address for memory
 	 */
 	int jobBegin, i, j, k, dest;
-	char[][] disk;
+	char[][][] disk;
 	PCB[] p;
 	int[] rq;
+	int size;
 	
-	public Scheduler(MemoryManager mgr, char[][] disk, PCB[] p, int[] rq)
+	public Scheduler(MemoryManager mgr, char[][][] disk, PCB[] p, int[] rq)
 	{
 		this.mgr = mgr;
 		jobBegin = -1;
@@ -54,12 +55,15 @@ public class Scheduler {
 			else
 			{
 				rq[i] = p[k].jobID;
-				p[k].base_Register = dest; // modify for m-scheduler later
-				for (int j=0; j<p[k].totalSize; j++)
+				p[k].base_Register = dest; 
+				size = p[k].totalSize/4;
+				if (p[k].totalSize%4 >0)
+					size++;
+				for (int j=0; j<size; j++)
 				{
-					mgr.WriteInstruction(dest+j,disk[jobBegin+j]);
+					mgr.WriteFrame(dest+j,disk[jobBegin+j]);
 				}
-				dest += p[k].totalSize;
+				dest += size;
 				p[k++].readyStart = System.nanoTime();
 			}
 		}
@@ -111,6 +115,7 @@ public class Scheduler {
         // Main loop
         while( leftPos <= leftEnd && rightPos <= rightEnd )
             if( p[a[leftPos]-1].codeSize < p[a[rightPos]-1].codeSize  )
+        	//if( p[a[leftPos]-1].priority < p[a[rightPos]-1].priority  )
                 tmpArray[ tmpPos++ ] = a[ leftPos++ ];
             else
                 tmpArray[ tmpPos++ ] = a[ rightPos++ ];

@@ -9,21 +9,31 @@
  */
 public class MemoryManager {
 
-	private char[][] memory; // subset of instructions on "RAM"
+	private char[][][] memory; // subset of instructions on "RAM"
 	
 	public MemoryManager()
 	{
-		memory = new char[1024][8];
+		memory = new char[256][4][8];
 	}
 	
-	public void WriteInstruction(int address, char[] instruction)
+	public void WriteFrame(int address, char[][] frame)
 	{
-		memory[address]=instruction;
+		memory[address] = frame;
 	}
 	
-	public char[] ReadInstruction(int address)
+	public char[][] ReadFrame(int address)
 	{
 		return memory[address];
 	}
+	
+//	public void WriteInstruction(int address, char[] instruction)
+//	{
+//		memory[address]=instruction;
+//	}
+//	
+//	public char[] ReadInstruction(int address)
+//	{
+//		return memory[address];
+//	}
 	
 }

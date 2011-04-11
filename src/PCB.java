@@ -10,6 +10,7 @@
 public class PCB {
 	
 	int PC; // Program counter
+	int FC; // Frame counter
 	int cpuID; // ID of CPU running a certain job
 	int jobID; // ID of a certain job
 	int codeSize; // Number of instructions in a job

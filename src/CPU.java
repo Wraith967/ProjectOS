@@ -9,7 +9,7 @@
  */
 public class CPU implements Runnable{
 	
-	char[][] cache; // Interior CPU cache
+	char[][][] cache; // Interior CPU cache
 	static int cpuNum; // Total number of CPUs created
 	int cpuID; // Unique ID for each CPU
 	Decode dec; // decodes instructions
@@ -23,13 +23,14 @@ public class CPU implements Runnable{
 	
 	public CPU(MemoryManager mgr, DMAChannel dm)
 	{
-		cache = new char[72][8]; // 72 is maximum total length 
+		cache = new char[18][4][8]; // 72 is maximum total length 
 		dec = new Decode();
 		exe = new Execute(this, mgr, dm);
 		inst = new char[8];
 		this.mgr = mgr;
 		cpuID = cpuNum++;
 		decodeInst = new int[5];
+		
 	}
 	
 	public void go()
@@ -46,9 +47,16 @@ public class CPU implements Runnable{
 		{
 			if (t.isInterrupted())
 				break;
-			inst = cache[p.PC++];
+			inst = cache[p.FC][p.PC];
 			decodeInst = dec.DecodeInst(inst);
 			exe.ExecInst(decodeInst);
+			p.PC++;
+			if (p.PC == 4)
+			{
+				p.PC = 0;
+				p.FC++;
+			}
 		}
+		p.runEnd = System.nanoTime();
 	}	
 }

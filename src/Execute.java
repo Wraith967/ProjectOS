@@ -88,13 +88,13 @@ public class Execute {
 				inst[i] = '0';
 			for (j=0; j<hexArr.length; j++)
 				inst[i+j] = hexArr[j];
-			pc.cache[EffectiveAddress.DirectAddress(0, pc.p.registerBank[c[3]])] = inst.clone();
+			//pc.cache[EffectiveAddress.DirectAddress(0, pc.p.registerBank[c[3]])] = inst.clone();
 			break;
 		case 3:
 			//System.out.println("LW" + " " + c[2] + " " + c[3] + " " + c[4]);
 			count++;
 			sum = 0;
-			inst = pc.cache[EffectiveAddress.DirectAddress(c[4],pc.p.registerBank[c[2]])].clone();
+			//inst = pc.cache[EffectiveAddress.DirectAddress(c[4],pc.p.registerBank[c[2]])].clone();
 			for (i=0; i<8; i++)
 			{
 				power = 1;
