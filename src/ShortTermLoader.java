@@ -24,7 +24,7 @@ public class ShortTermLoader {
 		
 		if (direction == 0)
 		{
-			for (int i=0; i<pc.p.totalSize; i++)
+			for (int i=0; i<6; i++)
 			{
 				pc.cache[i] = mgr.ReadFrame(pc.alpha + i).clone();
 			}

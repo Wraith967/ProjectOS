@@ -41,12 +41,6 @@ public class Dispatcher {
 		this.rq = rq;
 	}
 	
-	/**
-	 * 
-	 * @param c
-	 * @param p
-	 * @param rq
-	 */
 	public void MultiDispatch() throws InterruptedException
 	{
 		j=0;
@@ -58,7 +52,7 @@ public class Dispatcher {
 			LoadData(c[i], p[rq[readyIndex++]-1], i);
 			j++;
 		}
-		// TODO Add watch code on CPUs
+		
 		i = 0;
 		while (!isDone)
 		{
@@ -108,7 +102,6 @@ public class Dispatcher {
 	private void LoadData(CPU comp, PCB p, int i) throws InterruptedException
 	{
 		p.readyEnd = System.nanoTime();
-		p.PC = 0;
 		comp.p = p;
 		comp.alpha = p.base_Register;
 		comp.omega = comp.alpha + p.totalSize;

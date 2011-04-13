@@ -18,13 +18,16 @@ public class PCB {
 	int inputBuffer; // Size of input buffer
 	int outputBuffer; // Size of output buffer
 	int tempBuffer; // Size of temporary buffer
-	int beginIndex; // Index of first instruction in disk
-	int base_Register; // Index of first instruction in memory
+	int inputPage; // First page of input buffer
+	int outputPage; // First page of output buffer
+	int beginIndex; // Index of first page in disk
+	int base_Register; // Index of first frame in memory
 	int totalSize; // Total job space required
 	int count; // Number of I/O requests made
 	int[] registerBank = new int[16];
-	int[] changeIndex = new int[12]; // addresses of changes to memory
+	int[] changeIndex = new int[3]; // addresses of changes to memory
 	int numChange; // amount of changes
+	static PageTable p = new PageTable();
 	
 	long runTime; // Length of time job was on CPU
 	long readyTime; // Length of time on ready queue

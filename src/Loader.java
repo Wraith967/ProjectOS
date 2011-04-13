@@ -1,4 +1,5 @@
 import java.io.BufferedReader;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.regex.*;
@@ -43,7 +44,13 @@ public class Loader {
 	{
 		//System.out.println(pattern1.toString());
 		//System.out.println(pattern2.toString());
+		try{
 		inputStream = new BufferedReader(new FileReader(text));
+		} catch (FileNotFoundException e)
+		{
+			System.out.println("File does not exist");
+			return -1;
+		}
 		while (y != 30)
 		{
 			line = inputStream.readLine();
@@ -91,6 +98,8 @@ public class Loader {
 						z=0;
 						x++;
 					}
+					pArr[y].inputPage = x;
+					pArr[y].outputPage = x+5;
 				}
 				else
 				{

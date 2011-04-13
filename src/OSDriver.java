@@ -25,7 +25,7 @@ public class OSDriver {
 		//Data
 		char[][][] disk = new char[512][4][8]; // holds all instructions as 8 chars
 		PCB[] PCBarr = new PCB[30];
-		int[] readyQueue = new int[15];
+		int[] readyQueue = new int[30];
 		long avgRunTime=0, avgReadyTime=0;
 		long totalRunTime, runStart, runEnd;
 		String input, output;
@@ -38,11 +38,11 @@ public class OSDriver {
 		Loader control = new Loader(); // handles reading in and parsing of all instructions
 		MemoryManager mgr = new MemoryManager(); // handles RAM
 		DMAChannel dm = new DMAChannel(); // handles I/O requests
-		//Scheduler sched = new Scheduler(mgr, disk, PCBarr, readyQueue); // moves job to CPU
+		Scheduler sched = new Scheduler(mgr, disk, PCBarr, readyQueue); // moves job to CPU
 		CPU[] comp = new CPU[4]; // handles processing
 		for (int i=0; i<4; i++)
 			comp[i] = new CPU(mgr, dm);
-		//Dispatcher disp = new Dispatcher(mgr, sched, comp, PCBarr, readyQueue); // moves job data to CPU
+		Dispatcher disp = new Dispatcher(mgr, sched, comp, PCBarr, readyQueue); // moves job data to CPU
 		
 		//Method Calls
 		System.out.println("Name of input file:");
@@ -50,12 +50,18 @@ public class OSDriver {
 		System.out.println("Name of output file:");
 		output = scan.nextLine();
 		runStart = System.nanoTime();
+		dm.go();
 		int endIndex = control.runLoad(disk, input, PCBarr); // reads in datafile
-//		for (int i=0; i<2; i++)
-//		{
-//			sched.LoadMulti(i);
-//			disp.MultiDispatch();
-//		}
+		if (endIndex == -1)
+		{
+			System.out.println("System failure, shutting down");
+		}
+		else
+		{
+			sched.LoadMulti();
+			disp.MultiDispatch();
+		}
+		dm.kill();
 		runEnd = System.nanoTime();
 		CoreDump(PCBarr, disk, output, endIndex);
 		totalRunTime = runEnd - runStart;

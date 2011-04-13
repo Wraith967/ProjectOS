@@ -56,6 +56,7 @@ public class Execute {
 				sum += (HexToInt.convertHextoInt(inst[i]))*power;
 			}
 			pc.p.registerBank[c[2]] = sum;
+			//pc.p.PC--;
 			break;
 		case 1:
 			//System.out.println("WR" + " " + c[2] + " " + c[3] + " " + c[4]);
@@ -77,6 +78,7 @@ public class Execute {
 				dm.Write(0, c[4], inst.clone(), pc);
 				pc.p.changeIndex[pc.p.numChange++] = EffectiveAddress.DirectAddress(0,c[4]);
 			}
+			//pc.p.PC--;
 			break;
 		case 2:
 			//System.out.println("ST" + " " + c[2] + " " + c[3] + " " + c[4]);
@@ -208,6 +210,12 @@ public class Execute {
 			if (pc.p.registerBank[c[2]] < 0)
 				pc.p.PC = EffectiveAddress.DirectAddress(0, c[4]);
 			break;
+		}
+		pc.p.PC++;
+		if (pc.p.PC == 4)
+		{
+			pc.p.PC = 0;
+			pc.p.FC++;
 		}
 	}
 	

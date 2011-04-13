@@ -50,12 +50,6 @@ public class CPU implements Runnable{
 			inst = cache[p.FC][p.PC];
 			decodeInst = dec.DecodeInst(inst);
 			exe.ExecInst(decodeInst);
-			p.PC++;
-			if (p.PC == 4)
-			{
-				p.PC = 0;
-				p.FC++;
-			}
 		}
 		p.runEnd = System.nanoTime();
 	}	
