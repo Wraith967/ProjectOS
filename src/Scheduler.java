@@ -39,35 +39,41 @@ public class Scheduler {
 		{
 			p[i].base_Register=j;
 			mgr.WriteFrame(j, disk[p[i].beginIndex]);
+			p[i].pages[0] = j;
 			p[i].p.pTable[j][0] = 1;
 			p[i].p.pTable[j++][1] = 0;
 			mgr.WriteFrame(j, disk[p[i].beginIndex+1]);
+			p[i].pages[1 ]= j;
 			p[i].p.pTable[j][0] = 1;
 			p[i].p.pTable[j++][1] = 0;
 			mgr.WriteFrame(j, disk[p[i].beginIndex+2]);
+			p[i].pages[2] = j;
 			p[i].p.pTable[j][0] = 1;
 			p[i].p.pTable[j++][1] = 0;
 			mgr.WriteFrame(j, disk[p[i].beginIndex+3]);
+			p[i].pages[3] = j;
 			p[i].p.pTable[j][0] = 1;
 			p[i].p.pTable[j++][1] = 0;
 			mgr.WriteFrame(j, disk[p[i].inputPage]);
+			p[i].pages[p[i].numPages] = j;
 			p[i].p.pTable[j][0] = 1;
 			p[i].p.pTable[j++][1] = 0;
 			mgr.WriteFrame(j, disk[p[i].outputPage]);
+			p[i].pages[p[i].numPages+5] = j;
 			p[i].p.pTable[j][0] = 1;
 			p[i].p.pTable[j++][1] = 0;
 		}
-		p[0].p.PrintTable();
+//		p[0].p.PrintTable();
 //		for (i=0; i<j; i++)
 //			PrintMem(mgr.ReadFrame(i));
 	}
 	
-	private void PrintMem(char[][] frame)
-	{
-		for (int i=0; i<4; i++)
-			System.out.println(frame[i]);
-		System.out.println();
-	}
+//	private void PrintMem(char[][] frame)
+//	{
+//		for (int i=0; i<4; i++)
+//			System.out.println(frame[i]);
+//		System.out.println();
+//	}
 	
 	/**
      * Mergesort algorithm.

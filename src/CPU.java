@@ -10,6 +10,9 @@
 public class CPU implements Runnable{
 	
 	char[][][] cache; // Interior CPU cache
+	char[][][] inputCache;
+	char[][][] outputCache;
+	char[][][] tempCache;
 	static int cpuNum; // Total number of CPUs created
 	int cpuID; // Unique ID for each CPU
 	Decode dec; // decodes instructions
@@ -17,13 +20,16 @@ public class CPU implements Runnable{
 	char[] inst; // array for each instruction
 	MemoryManager mgr; // for access to memory
 	int[] decodeInst; // array for decoded instruction
-	int alpha, omega; // begin/end indices for memory usage
+	//int alpha, omega; // begin/end indices for memory usage
 	PCB p;
 	Thread t;
 	
 	public CPU(MemoryManager mgr, DMAChannel dm)
 	{
-		cache = new char[18][4][8]; // 72 is maximum total length 
+		cache = new char[7][4][8]; // 72 is maximum total length 
+		inputCache = new char[5][4][8];
+		outputCache = new char[3][4][8];
+		tempCache = new char[3][4][8];
 		dec = new Decode();
 		exe = new Execute(this, mgr, dm);
 		inst = new char[8];

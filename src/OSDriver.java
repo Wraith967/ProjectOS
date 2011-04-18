@@ -24,6 +24,7 @@ public class OSDriver {
 		
 		//Data
 		char[][][] disk = new char[512][4][8]; // holds all instructions as 8 chars
+		PageTable PTable = new PageTable();
 		PCB[] PCBarr = new PCB[30];
 		int[] readyQueue = new int[30];
 		long avgRunTime=0, avgReadyTime=0;
@@ -32,7 +33,10 @@ public class OSDriver {
 		Scanner scan = new Scanner(System.in);
 		
 		for (int i=0; i<30; i++)
+		{
 			PCBarr[i] = new PCB();
+			PCBarr[i].p = PTable;
+		}
 		
 		//Modules
 		Loader control = new Loader(); // handles reading in and parsing of all instructions

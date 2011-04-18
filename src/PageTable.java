@@ -14,7 +14,7 @@ public class PageTable {
 	
 	public PageTable()
 	{
-		pTable = new int[256][2]; //One index for each frame in memory, with a valid/invalid bit and a modified bit
+		pTable = new int[256][2]; //One index for each frame in memory, with a valid/invalid bit, a modified bit
 	}
 	
 	public void PrintTable()

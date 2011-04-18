@@ -27,7 +27,9 @@ public class PCB {
 	int[] registerBank = new int[16];
 	int[] changeIndex = new int[3]; // addresses of changes to memory
 	int numChange; // amount of changes
-	static PageTable p = new PageTable();
+	PageTable p;
+	int[] pages;
+	int numPages;
 	
 	long runTime; // Length of time job was on CPU
 	long readyTime; // Length of time on ready queue
@@ -57,6 +59,10 @@ public class PCB {
 		totalSize = codeSize + inputBuffer + outputBuffer + tempBuffer;
 		for (int i=0; i<16; i++)
 			registerBank[i]=0;
+		numPages = codeSize/4;
+		if (codeSize%4 != 0)
+			numPages++;
+		pages = new int[numPages+8];			
 	}
 	
 	public void ComputeTime()

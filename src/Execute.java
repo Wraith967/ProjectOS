@@ -16,6 +16,7 @@ public class Execute {
 	String hex; 
 	int sum, power, i, j;
 	int count; // number of I/O requests per job
+	int address, offset;
 	
 	public Execute(CPU c, MemoryManager m, DMAChannel dm)
 	{
@@ -69,15 +70,9 @@ public class Execute {
 			for (j=0; j<hexArr.length; j++)
 				inst[i+j] = hexArr[j];
 			if (c[4]==0)
-			{
 				dm.Write(0, pc.p.registerBank[c[3]], inst.clone(), pc);
-				pc.p.changeIndex[pc.p.numChange++] = EffectiveAddress.DirectAddress(0,pc.p.registerBank[c[3]]);
-			}
 			else
-			{
 				dm.Write(0, c[4], inst.clone(), pc);
-				pc.p.changeIndex[pc.p.numChange++] = EffectiveAddress.DirectAddress(0,c[4]);
-			}
 			//pc.p.PC--;
 			break;
 		case 2:
@@ -90,13 +85,21 @@ public class Execute {
 				inst[i] = '0';
 			for (j=0; j<hexArr.length; j++)
 				inst[i+j] = hexArr[j];
-			//pc.cache[EffectiveAddress.DirectAddress(0, pc.p.registerBank[c[3]])] = inst.clone();
+			address = EffectiveAddress.DirectAddress(0, pc.p.registerBank[c[3]]);
+			offset = address % 4;
+			address = address / 4;
+			address = address - (pc.p.totalSize-12)/4;
+			pc.tempCache[address][offset] = inst.clone();
 			break;
 		case 3:
 			//System.out.println("LW" + " " + c[2] + " " + c[3] + " " + c[4]);
 			count++;
 			sum = 0;
-			//inst = pc.cache[EffectiveAddress.DirectAddress(c[4],pc.p.registerBank[c[2]])].clone();
+			address = EffectiveAddress.DirectAddress(c[4],pc.p.registerBank[c[2]]);
+			offset = address % 4;
+			address = address / 4;
+			address = address - (pc.p.totalSize-12)/4;
+			inst = pc.tempCache[address][offset].clone();
 			for (i=0; i<8; i++)
 			{
 				power = 1;

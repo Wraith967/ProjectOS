@@ -49,7 +49,7 @@ public class Dispatcher {
 		CPUDone = false;
 		for (int i=0; i<4; i++)
 		{
-			LoadData(c[i], p[rq[readyIndex++]-1], i);
+			LoadData(c[i], p[rq[readyIndex++]-1], i, 6);
 			j++;
 		}
 		
@@ -61,11 +61,11 @@ public class Dispatcher {
 				//threadMessage("CPU " + i + " is done");
 				doneIndex = i;
 				c[doneIndex].p.runEnd = System.nanoTime();
-				ShortTermLoader.DataSwap(mgr, c[doneIndex], 1);
+				ShortTermLoader.DataSwap(mgr, c[doneIndex], 1, 0);
 				MemoryDump.MemDump(sch.disk, mgr, c[doneIndex].p);
-				if (j<15)
+				if (j<29)
 				{
-					LoadData(c[doneIndex], p[rq[readyIndex++]-1], doneIndex);
+					LoadData(c[doneIndex], p[rq[readyIndex]-1], doneIndex, p[rq[readyIndex++]-1].numPages);
 					j++;
 				}
 				else
@@ -84,7 +84,7 @@ public class Dispatcher {
 				{
 					//threadMessage("CPU " + i + " is done");
 					doneIndex = i;
-					ShortTermLoader.DataSwap(mgr, c[doneIndex], 1);
+					ShortTermLoader.DataSwap(mgr, c[doneIndex], 1, 0);
 					MemoryDump.MemDump(sch.disk, mgr, c[doneIndex].p);
 					CPUDone = true;
 				}
@@ -99,13 +99,13 @@ public class Dispatcher {
 	 * @param p
 	 * @param index
 	 */
-	private void LoadData(CPU comp, PCB p, int i) throws InterruptedException
+	private void LoadData(CPU comp, PCB p, int i, int num) throws InterruptedException
 	{
 		p.readyEnd = System.nanoTime();
 		comp.p = p;
-		comp.alpha = p.base_Register;
-		comp.omega = comp.alpha + p.totalSize;
-		ShortTermLoader.DataSwap(mgr, comp, 0);
+//		comp.alpha = p.base_Register;
+//		comp.omega = comp.alpha + p.totalSize;
+		ShortTermLoader.DataSwap(mgr, comp, 0, num);
 		//threadMessage("Starting CPU " + i);
 		comp.go();
 		
