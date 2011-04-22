@@ -20,61 +20,55 @@ public class Dispatcher {
 	
 	MemoryManager mgr;
 	Scheduler sch;
-	int readyIndex; // index for ready queue
 	boolean isDone; // checks for completion of application
 	boolean CPUDone;
 	int doneIndex; // index of finished CPU
-	int i, j;
+	int i;
 	CPU[] c;
 	PCB[] p;
-	int[] rq;
+	BlockingQueue rq, read, write;
 	
-	public Dispatcher(MemoryManager mgr, Scheduler sch, CPU[] c, PCB[] p, int[] rq)
+	public Dispatcher(MemoryManager mgr, Scheduler sch, CPU[] c, PCB[] p, BlockingQueue rq, BlockingQueue r, BlockingQueue w)
 	{
 		this.mgr = mgr;
 		this.sch = sch;
 		isDone = false;
-		readyIndex = 0;
 		CPUDone = false;
 		this.c = c;
 		this.p = p;
 		this.rq = rq;
+		read = r;
+		write = w;
 	}
 	
 	public void MultiDispatch() throws InterruptedException
 	{
-		j=0;
 		isDone = false;
-		readyIndex = 0;
 		CPUDone = false;
 		for (int i=0; i<4; i++)
 		{
-			LoadData(c[i], p[rq[readyIndex++]-1], i, 6);
-			j++;
+			LoadData(c[i], rq.pop(), i, 6);
 		}
 		
 		i = 0;
-		while (!isDone)
+		while (!read.isEmpty() || !write.isEmpty() || !rq.isEmpty())
 		{
-			if (!c[i].t.isAlive())
+			while (!rq.isEmpty())
 			{
-				//threadMessage("CPU " + i + " is done");
-				doneIndex = i;
-				c[doneIndex].p.runEnd = System.nanoTime();
-				ShortTermLoader.DataSwap(mgr, c[doneIndex], 1, 0);
-				MemoryDump.MemDump(sch.disk, mgr, c[doneIndex].p);
-				if (j<29)
+				if (!c[i].t.isAlive())
 				{
-					LoadData(c[doneIndex], p[rq[readyIndex]-1], doneIndex, p[rq[readyIndex++]-1].numPages);
-					j++;
+					//threadMessage("CPU " + i + " is done");
+					doneIndex = i;
+					c[doneIndex].p.runEnd = System.nanoTime();
+					ShortTermLoader.DataSwap(mgr, c[doneIndex], 1, 0);
+					MemoryDump.MemDump(sch.disk, mgr, c[doneIndex].p);
+					PCB temp = rq.pop();
+					LoadData(c[doneIndex], temp, doneIndex, temp.numPages);
+					
 				}
-				else
-				{
-					isDone = true;
-				}
+				i++;
+				i %= 4;
 			}
-			i++;
-			i %= 4;
 		}
 		for (i=0; i<4; i++)
 		{

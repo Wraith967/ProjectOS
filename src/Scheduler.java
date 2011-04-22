@@ -13,10 +13,10 @@ public class Scheduler {
 	int jobBegin, i, j;
 	char[][][] disk;
 	PCB[] p;
-	int[] rq;
+	BlockingQueue rq;
 	int size;
 	
-	public Scheduler(MemoryManager mgr, char[][][] disk, PCB[] p, int[] rq)
+	public Scheduler(MemoryManager mgr, char[][][] disk, PCB[] p, BlockingQueue rq)
 	{
 		this.mgr = mgr;
 		jobBegin = -1;
@@ -29,9 +29,9 @@ public class Scheduler {
 	
 	public void LoadMulti()
 	{
-		for (i=0; i<rq.length; i++)
-			rq[i] = p[i].jobID;
-		mergeSort();
+		for (i=0; i<30; i++)
+			rq.push(p[i]);
+		rq.sort();
 //		for (i=0; i<rq.length; i++)
 //			System.out.println(rq[i]);
 		j=0;
@@ -62,75 +62,20 @@ public class Scheduler {
 			p[i].pages[p[i].numPages+5] = j;
 			p[i].p.pTable[j][0] = 1;
 			p[i].p.pTable[j++][1] = 0;
+//			System.out.println(p[i].pages[p[i].numPages]);
+//			System.out.println(p[i].pages[p[i].numPages+5]);
 		}
+		
 //		p[0].p.PrintTable();
 //		for (i=0; i<j; i++)
 //			PrintMem(mgr.ReadFrame(i));
 	}
 	
-//	private void PrintMem(char[][] frame)
-//	{
-//		for (int i=0; i<4; i++)
-//			System.out.println(frame[i]);
-//		System.out.println();
-//	}
+	private void PrintMem(char[][] frame)
+	{
+		for (int i=0; i<4; i++)
+			System.out.println(frame[i]);
+		System.out.println();
+	}
 	
-	/**
-     * Mergesort algorithm.
-     * @param a an array of Comparable items.
-     */
-    private void mergeSort() {
-        int [] tmpArray = new int[ rq.length ];
-        mergeSort( tmpArray, 0, rq.length - 1 );
-    }
-    
-    /**
-     * Internal method that makes recursive calls.
-     * @param a an array of Comparable items.
-     * @param tmpArray an array to place the merged result.
-     * @param left the left-most index of the subarray.
-     * @param right the right-most index of the subarray.
-     */
-    private void mergeSort( int [ ] tmpArray,
-            int left, int right ) {
-        if( left < right ) {
-            int center = ( left + right ) / 2;
-            mergeSort( tmpArray, left, center );
-            mergeSort( tmpArray, center + 1, right );
-            merge( tmpArray, left, center + 1, right );
-        }
-    }
-    
-    /**
-     * Internal method that merges two sorted halves of a subarray.
-     * @param a an array of Comparable items.
-     * @param tmpArray an array to place the merged result.
-     * @param leftPos the left-most index of the subarray.
-     * @param rightPos the index of the start of the second half.
-     * @param rightEnd the right-most index of the subarray.
-     */
-    private void merge( int [ ] tmpArray,
-            int leftPos, int rightPos, int rightEnd ) {
-        int leftEnd = rightPos - 1;
-        int tmpPos = leftPos;
-        int numElements = rightEnd - leftPos + 1;
-        
-        // Main loop
-        while( leftPos <= leftEnd && rightPos <= rightEnd )
-            if( p[rq[leftPos]-1].codeSize < p[rq[rightPos]-1].codeSize  )
-        	//if( p[rq[leftPos]-1].priority > p[rq[rightPos]-1].priority  )
-                tmpArray[ tmpPos++ ] = rq[ leftPos++ ];
-            else
-                tmpArray[ tmpPos++ ] = rq[ rightPos++ ];
-        
-        while( leftPos <= leftEnd )    // Copy rest of first half
-            tmpArray[ tmpPos++ ] = rq[ leftPos++ ];
-        
-        while( rightPos <= rightEnd )  // Copy rest of right half
-            tmpArray[ tmpPos++ ] = rq[ rightPos++ ];
-        
-        // Copy tmpArray back
-        for( int i = 0; i < numElements; i++, rightEnd-- )
-            rq[ rightEnd ] = tmpArray[ rightEnd ];
-    }
 }

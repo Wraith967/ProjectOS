@@ -28,8 +28,11 @@ public class PCB {
 	int[] changeIndex = new int[3]; // addresses of changes to memory
 	int numChange; // amount of changes
 	PageTable p;
-	int[] pages;
-	int numPages;
+	int[] pages; // holds addresses of frames in page table
+	int numPages; // number of frames for instruction space
+	int ioFrame; // address of instructions for I/O requests
+	int ioOffset;
+	int[] curInst;
 	
 	long runTime; // Length of time job was on CPU
 	long readyTime; // Length of time on ready queue
@@ -62,7 +65,9 @@ public class PCB {
 		numPages = codeSize/4;
 		if (codeSize%4 != 0)
 			numPages++;
-		pages = new int[numPages+8];			
+		pages = new int[numPages+8];
+		for (int i=0; i<numPages+8; i++)
+			pages[i] = -1;
 	}
 	
 	public void ComputeTime()

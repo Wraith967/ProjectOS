@@ -26,18 +26,21 @@ public class ShortTermLoader {
 		{
 			for (int i=0; i<num; i++)
 			{
-				if (pc.p.p.pTable[pc.p.pages[i]][0] == 1)
-					pc.cache[i] = mgr.ReadFrame(pc.p.base_Register + i).clone();
+				if (pc.p.pages[i] != -1)
+					if (pc.p.p.pTable[pc.p.pages[i]][0] == 1)
+						pc.cache[i] = mgr.ReadFrame(pc.p.base_Register + i).clone();
 			}
 			for (int i=0; i<5; i++)
 			{
-				if (pc.p.p.pTable[pc.p.pages[pc.p.numPages+i]][0] == 1)
-					pc.inputCache[i] = mgr.ReadFrame(pc.p.pages[pc.p.numPages+i]);
+				if (pc.p.pages[pc.p.numPages+i] != -1)
+					if (pc.p.p.pTable[pc.p.pages[pc.p.numPages+i]][0] == 1)
+						pc.inputCache[i] = mgr.ReadFrame(pc.p.pages[pc.p.numPages+i]);
 			}
 			for (int i=0; i<3; i++)
 			{
-				if (pc.p.p.pTable[pc.p.pages[pc.p.numPages+5+i]][0] == 1)
-					pc.inputCache[i] = mgr.ReadFrame(pc.p.pages[pc.p.numPages+5+i]);
+				if (pc.p.pages[pc.p.numPages+5+i] != -1)
+					if (pc.p.p.pTable[pc.p.pages[pc.p.numPages+5+i]][0] == 1)
+						pc.inputCache[i] = mgr.ReadFrame(pc.p.pages[pc.p.numPages+5+i]);
 			}
 		}
 		else

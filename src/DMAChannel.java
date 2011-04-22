@@ -11,33 +11,49 @@ public class DMAChannel implements Runnable{
 
 	Thread t;
 	int address, offset;
+	BlockingQueue read, write, rdy;
+	int power, sum;
+	char[] inst;
+	MemoryManager mgr;
 	
-	public DMAChannel()
+	public DMAChannel(BlockingQueue r, BlockingQueue w, BlockingQueue rdy, MemoryManager m)
 	{
 		address = 0;
+		read = r;
+		write = w;
+		this.rdy = rdy;
+		mgr = m;
 	}
 	
-	public char[] Read(int n, int m, CPU pc)
+	public void Read() throws InterruptedException
 	{
-		//System.out.println("Read from CPU " + pc.cpuID);
-		address = EffectiveAddress.DirectAddress(n,m);
-		offset = address % 4;
-		address = address / 4;
-		if (pc.p.codeSize%4 != 0)
-			address = address - (pc.p.codeSize/4) + 1;
-		else
-			address = address - (pc.p.codeSize/4);
-		return pc.inputCache[address][offset].clone();
+		PCB temp = read.pop();
+		Dispatcher.threadMessage("Read called for PCB: " + temp.jobID + " at FC: " + temp.FC + " at PC: " + temp.PC);
+		sum = 0;
+		Dispatcher.threadMessage("Reading with numPages = " + temp.numPages + " and ioFrame = " + temp.ioFrame);
+		inst = mgr.ReadFrame(temp.pages[temp.numPages+temp.ioFrame])[temp.ioOffset];
+		for (int i=0; i<8; i++)
+		{
+			power = 1;
+			for (int j=0; j<7-i; j++)
+			{
+				power *=16;
+			}
+			sum += (HexToInt.convertHextoInt(inst[i]))*power;
+		}
+		temp.registerBank[temp.curInst[2]] = sum;
+		temp.PC++;
+		if (temp.PC == 4)
+		{
+			temp.PC = 0;
+			temp.FC++;
+		}
+		rdy.push(temp);
 	}
 	
-	public void Write(int n, int m, char[] c, CPU pc)
+	public void Write()
 	{
-		//System.out.println("Write from CPU " + pc.cpuID);
-		address = EffectiveAddress.DirectAddress(n,m);
-		offset = address % 4;
-		address = address / 4;
-		address = address - (pc.p.totalSize-24)/4;
-		pc.outputCache[address][offset] = c;
+		
 	}
 
 	public void go()
@@ -61,6 +77,15 @@ public class DMAChannel implements Runnable{
 				Dispatcher.threadMessage("DMAChannel shutting down");
 				break;
 			}
+			if (!read.isEmpty())
+				try {
+					Read();
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			if (!write.isEmpty())
+				Write();
 		}
 	}
 	

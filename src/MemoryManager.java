@@ -18,12 +18,20 @@ public class MemoryManager {
 	
 	public void WriteFrame(int address, char[][] frame)
 	{
-		memory[address] = frame;
+		synchronized(memory){
+			memory[address] = frame;
+			memory.notify();
+		}
 	}
 	
 	public char[][] ReadFrame(int address)
 	{
-		return memory[address];
+		char [][] temp;
+		synchronized(memory){
+			temp = memory[address];
+			memory.notify();
+		}
+		return temp;
 	}
 	
 //	public void WriteInstruction(int address, char[] instruction)

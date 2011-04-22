@@ -26,7 +26,9 @@ public class OSDriver {
 		char[][][] disk = new char[512][4][8]; // holds all instructions as 8 chars
 		PageTable PTable = new PageTable();
 		PCB[] PCBarr = new PCB[30];
-		int[] readyQueue = new int[30];
+		BlockingQueue readyQueue = new BlockingQueue();
+		BlockingQueue readQueue = new BlockingQueue();
+		BlockingQueue writeQueue = new BlockingQueue();
 		long avgRunTime=0, avgReadyTime=0;
 		long totalRunTime, runStart, runEnd;
 		String input, output;
@@ -41,12 +43,12 @@ public class OSDriver {
 		//Modules
 		Loader control = new Loader(); // handles reading in and parsing of all instructions
 		MemoryManager mgr = new MemoryManager(); // handles RAM
-		DMAChannel dm = new DMAChannel(); // handles I/O requests
+		DMAChannel dm = new DMAChannel(readQueue, writeQueue, readyQueue, mgr); // handles I/O requests
 		Scheduler sched = new Scheduler(mgr, disk, PCBarr, readyQueue); // moves job to CPU
 		CPU[] comp = new CPU[4]; // handles processing
 		for (int i=0; i<4; i++)
-			comp[i] = new CPU(mgr, dm);
-		Dispatcher disp = new Dispatcher(mgr, sched, comp, PCBarr, readyQueue); // moves job data to CPU
+			comp[i] = new CPU(mgr, readQueue, writeQueue);
+		Dispatcher disp = new Dispatcher(mgr, sched, comp, PCBarr, readyQueue, readQueue, writeQueue); // moves job data to CPU
 		
 		//Method Calls
 		System.out.println("Name of input file:");

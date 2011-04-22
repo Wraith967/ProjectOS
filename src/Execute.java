@@ -11,20 +11,19 @@ public class Execute {
 	
 	CPU pc;
 	MemoryManager mgr;
-	DMAChannel dm;
 	char[] inst, hexArr;
 	String hex; 
 	int sum, power, i, j;
-	int count; // number of I/O requests per job
 	int address, offset;
+	BlockingQueue read, write;
 	
-	public Execute(CPU c, MemoryManager m, DMAChannel dm)
+	public Execute(CPU c, MemoryManager m, BlockingQueue r, BlockingQueue w)
 	{
 		pc = c;
 		mgr = m;
 		inst = new char[8];
-		this.dm = dm;
-		count = 0;
+		read = r;
+		write = w;
 	}
 	
 	/**
@@ -41,27 +40,26 @@ public class Execute {
 		{
 		case 0:
 			//System.out.println("RD" + " " + c[2] + " " + c[3] + " " + c[4]);
-			count++;
-			sum = 0;
-			if (c[4] == 0)
-				inst = dm.Read(0, pc.p.registerBank[c[3]], pc);
+			pc.p.count++;
+			if (c[4]==0)
+				address = EffectiveAddress.DirectAddress(0,pc.p.registerBank[c[3]]);
 			else
-				inst = dm.Read(0, c[4], pc);
-			for (i=0; i<8; i++)
-			{
-				power = 1;
-				for (j=0; j<7-i; j++)
-				{
-					power *=16;
-				}
-				sum += (HexToInt.convertHextoInt(inst[i]))*power;
-			}
-			pc.p.registerBank[c[2]] = sum;
-			//pc.p.PC--;
+				address = EffectiveAddress.DirectAddress(0, c[4]);
+			offset = address % 4;
+			address = address / 4;
+			if (pc.p.codeSize%4 != 0)
+				pc.p.ioFrame = address - pc.p.numPages + 1;
+			else
+				pc.p.ioFrame = address - pc.p.numPages;
+			pc.p.ioOffset = offset;
+			pc.p.curInst = c;
+			
+			read.push(pc.p);
+			pc.t.interrupt();
 			break;
 		case 1:
 			//System.out.println("WR" + " " + c[2] + " " + c[3] + " " + c[4]);
-			count++;
+			pc.p.count++;
 			hex = Integer.toHexString(pc.p.registerBank[c[2]]);
 			hex = hex.toUpperCase();
 			hexArr = hex.toCharArray();
@@ -70,14 +68,28 @@ public class Execute {
 			for (j=0; j<hexArr.length; j++)
 				inst[i+j] = hexArr[j];
 			if (c[4]==0)
-				dm.Write(0, pc.p.registerBank[c[3]], inst.clone(), pc);
+				address = EffectiveAddress.DirectAddress(0,pc.p.registerBank[c[3]]);
 			else
-				dm.Write(0, c[4], inst.clone(), pc);
-			//pc.p.PC--;
+				address = EffectiveAddress.DirectAddress(0, c[4]);
+			offset = address % 4;
+			address = address / 4;
+			if (pc.p.codeSize%4 != 0)
+				pc.p.ioFrame = address - (pc.p.codeSize/4) - 4;
+			else
+				pc.p.ioFrame = address - (pc.p.codeSize/4) - 5;
+			pc.p.ioOffset = offset;
+			pc.p.curInst = c;
+			pc.p.PC++;
+			if (pc.p.PC == 4)
+			{
+				pc.p.PC = 0;
+				pc.p.FC++;
+			}
+			write.push(pc.p);			
+			pc.t.interrupt();
 			break;
 		case 2:
 			//System.out.println("ST" + " " + c[2] + " " + c[3] + " " + c[4]);
-			count++;
 			hex = Integer.toHexString(pc.p.registerBank[c[2]]);
 			hex = hex.toUpperCase();
 			hexArr = hex.toCharArray();
@@ -85,20 +97,31 @@ public class Execute {
 				inst[i] = '0';
 			for (j=0; j<hexArr.length; j++)
 				inst[i+j] = hexArr[j];
-			address = EffectiveAddress.DirectAddress(0, pc.p.registerBank[c[3]]);
+			if (c[4]==0)
+				address = EffectiveAddress.DirectAddress(0,pc.p.registerBank[c[3]]);
+			else
+				address = EffectiveAddress.DirectAddress(0, c[4]);
 			offset = address % 4;
 			address = address / 4;
-			address = address - (pc.p.totalSize-12)/4;
+			if (pc.p.codeSize%4 != 0)
+				address = address - pc.p.numPages + 1;
+			else
+				address = address - pc.p.numPages;
 			pc.tempCache[address][offset] = inst.clone();
 			break;
 		case 3:
 			//System.out.println("LW" + " " + c[2] + " " + c[3] + " " + c[4]);
-			count++;
 			sum = 0;
-			address = EffectiveAddress.DirectAddress(c[4],pc.p.registerBank[c[2]]);
+			if (c[4]==0)
+				address = EffectiveAddress.DirectAddress(0,pc.p.registerBank[c[3]]);
+			else
+				address = EffectiveAddress.DirectAddress(0, c[4]);
 			offset = address % 4;
 			address = address / 4;
-			address = address - (pc.p.totalSize-12)/4;
+			if (pc.p.codeSize%4 != 0)
+				address = address - pc.p.numPages + 1;
+			else
+				address = address - pc.p.numPages;
 			inst = pc.tempCache[address][offset].clone();
 			for (i=0; i<8; i++)
 			{

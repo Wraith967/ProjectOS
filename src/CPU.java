@@ -24,14 +24,14 @@ public class CPU implements Runnable{
 	PCB p;
 	Thread t;
 	
-	public CPU(MemoryManager mgr, DMAChannel dm)
+	public CPU(MemoryManager mgr, BlockingQueue read, BlockingQueue write)
 	{
 		cache = new char[7][4][8]; // 72 is maximum total length 
 		inputCache = new char[5][4][8];
 		outputCache = new char[3][4][8];
 		tempCache = new char[3][4][8];
 		dec = new Decode();
-		exe = new Execute(this, mgr, dm);
+		exe = new Execute(this, mgr, read, write);
 		inst = new char[8];
 		this.mgr = mgr;
 		cpuID = cpuNum++;
@@ -53,9 +53,17 @@ public class CPU implements Runnable{
 		{
 			if (t.isInterrupted())
 				break;
-			inst = cache[p.FC][p.PC];
-			decodeInst = dec.DecodeInst(inst);
-			exe.ExecInst(decodeInst);
+			if (p.pages[p.FC] == -1)
+			{
+				Dispatcher.threadMessage("Need more pages");
+				t.interrupt();
+			}
+			else
+			{
+				inst = cache[p.FC][p.PC];
+				decodeInst = dec.DecodeInst(inst);
+				exe.ExecInst(decodeInst);
+			}
 		}
 		p.runEnd = System.nanoTime();
 	}	
