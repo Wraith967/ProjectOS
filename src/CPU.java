@@ -47,7 +47,7 @@ public class CPU implements Runnable{
 	
 	public void run()
 	{
-		p.runStart = System.nanoTime();
+		//p.runStart = System.nanoTime();
 		Dispatcher.threadMessage("working");
 		while (true)
 		{
@@ -56,15 +56,17 @@ public class CPU implements Runnable{
 			if (p.pages[p.FC] == -1)
 			{
 				Dispatcher.threadMessage("Need more pages");
+				//Dispatcher.threadMessage("Interrupt status: " + t.isInterrupted());
 				t.interrupt();
 			}
 			else
 			{
+				//Dispatcher.threadMessage("Reading instruction from: " + p.FC + " at " + p.PC);
 				inst = cache[p.FC][p.PC];
 				decodeInst = dec.DecodeInst(inst);
 				exe.ExecInst(decodeInst);
 			}
 		}
-		p.runEnd = System.nanoTime();
+		//p.runEnd = System.nanoTime();
 	}	
 }

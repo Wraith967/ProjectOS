@@ -45,15 +45,12 @@ public class Execute {
 				address = EffectiveAddress.DirectAddress(0,pc.p.registerBank[c[3]]);
 			else
 				address = EffectiveAddress.DirectAddress(0, c[4]);
+			address -= pc.p.codeSize;
 			offset = address % 4;
 			address = address / 4;
-			if (pc.p.codeSize%4 != 0)
-				pc.p.ioFrame = address - pc.p.numPages + 1;
-			else
-				pc.p.ioFrame = address - pc.p.numPages;
+			pc.p.ioFrame = address;
 			pc.p.ioOffset = offset;
-			pc.p.curInst = c;
-			
+			pc.p.readInst = c;
 			read.push(pc.p);
 			pc.t.interrupt();
 			break;
@@ -71,20 +68,12 @@ public class Execute {
 				address = EffectiveAddress.DirectAddress(0,pc.p.registerBank[c[3]]);
 			else
 				address = EffectiveAddress.DirectAddress(0, c[4]);
+			address -= (pc.p.codeSize + 20) ;
 			offset = address % 4;
 			address = address / 4;
-			if (pc.p.codeSize%4 != 0)
-				pc.p.ioFrame = address - (pc.p.codeSize/4) - 4;
-			else
-				pc.p.ioFrame = address - (pc.p.codeSize/4) - 5;
+			pc.p.ioFrame = address;
 			pc.p.ioOffset = offset;
-			pc.p.curInst = c;
-			pc.p.PC++;
-			if (pc.p.PC == 4)
-			{
-				pc.p.PC = 0;
-				pc.p.FC++;
-			}
+			pc.p.writeInst = inst.clone();
 			write.push(pc.p);			
 			pc.t.interrupt();
 			break;
@@ -101,12 +90,9 @@ public class Execute {
 				address = EffectiveAddress.DirectAddress(0,pc.p.registerBank[c[3]]);
 			else
 				address = EffectiveAddress.DirectAddress(0, c[4]);
+			address -= (pc.p.codeSize + 32);
 			offset = address % 4;
 			address = address / 4;
-			if (pc.p.codeSize%4 != 0)
-				address = address - pc.p.numPages + 1;
-			else
-				address = address - pc.p.numPages;
 			pc.tempCache[address][offset] = inst.clone();
 			break;
 		case 3:
@@ -116,12 +102,9 @@ public class Execute {
 				address = EffectiveAddress.DirectAddress(0,pc.p.registerBank[c[3]]);
 			else
 				address = EffectiveAddress.DirectAddress(0, c[4]);
+			address -= (pc.p.codeSize + 32);
 			offset = address % 4;
 			address = address / 4;
-			if (pc.p.codeSize%4 != 0)
-				address = address - pc.p.numPages + 1;
-			else
-				address = address - pc.p.numPages;
 			inst = pc.tempCache[address][offset].clone();
 			for (i=0; i<8; i++)
 			{

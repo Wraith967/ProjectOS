@@ -35,10 +35,7 @@ public class OSDriver {
 		Scanner scan = new Scanner(System.in);
 		
 		for (int i=0; i<30; i++)
-		{
-			PCBarr[i] = new PCB();
-			PCBarr[i].p = PTable;
-		}
+		PCBarr[i] = new PCB(PTable);
 		
 		//Modules
 		Loader control = new Loader(); // handles reading in and parsing of all instructions
@@ -48,6 +45,7 @@ public class OSDriver {
 		CPU[] comp = new CPU[4]; // handles processing
 		for (int i=0; i<4; i++)
 			comp[i] = new CPU(mgr, readQueue, writeQueue);
+		PageHandler PH = new PageHandler(PTable, mgr, disk);
 		Dispatcher disp = new Dispatcher(mgr, sched, comp, PCBarr, readyQueue, readQueue, writeQueue); // moves job data to CPU
 		
 		//Method Calls
@@ -64,8 +62,8 @@ public class OSDriver {
 		}
 		else
 		{
-			sched.LoadMulti();
-			disp.MultiDispatch();
+			//sched.LoadMulti(PTable);
+			//disp.MultiDispatch(PH);
 		}
 		dm.kill();
 		runEnd = System.nanoTime();

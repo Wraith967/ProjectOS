@@ -18,7 +18,7 @@ public class MemoryDump {
 			size = size%4;
 		for (int i=0; i<size; i++)
 		{
-			disk[p.beginIndex+i] = mgr.ReadFrame(p.base_Register + i).clone();
+			disk[p.beginIndex+i] = mgr.ReadFrame(p.pages[i]).clone();
 		}
 	}
 }

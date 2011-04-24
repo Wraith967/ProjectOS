@@ -22,7 +22,6 @@ public class Dispatcher {
 	Scheduler sch;
 	boolean isDone; // checks for completion of application
 	boolean CPUDone;
-	int doneIndex; // index of finished CPU
 	int i;
 	CPU[] c;
 	PCB[] p;
@@ -41,13 +40,14 @@ public class Dispatcher {
 		write = w;
 	}
 	
-	public void MultiDispatch() throws InterruptedException
+	public void MultiDispatch(PageHandler PH) throws InterruptedException
 	{
 		isDone = false;
 		CPUDone = false;
 		for (int i=0; i<4; i++)
 		{
-			LoadData(c[i], rq.pop(), i, 6);
+			LoadData(c[i], rq.pop(), 6);
+			c[i].go();
 		}
 		
 		i = 0;
@@ -57,13 +57,38 @@ public class Dispatcher {
 			{
 				if (!c[i].t.isAlive())
 				{
-					//threadMessage("CPU " + i + " is done");
-					doneIndex = i;
-					c[doneIndex].p.runEnd = System.nanoTime();
-					ShortTermLoader.DataSwap(mgr, c[doneIndex], 1, 0);
-					MemoryDump.MemDump(sch.disk, mgr, c[doneIndex].p);
-					PCB temp = rq.pop();
-					LoadData(c[doneIndex], temp, doneIndex, temp.numPages);
+					if (c[i].p.running)
+					{
+						if(!(PH.LoadInstPage(c[i].p)))
+						{
+							c[i].p.runEnd = System.nanoTime();
+							ShortTermLoader.DataSwap(mgr, c[i], 1, 0);
+							PCB temp = rq.pop();
+							rq.push(c[i].p);
+							LoadData(c[i], temp, temp.numPages);
+							c[i].go();
+						}
+						else
+							c[i].go();
+					}
+					else if (c[i].p.finished)
+					{
+						threadMessage("Job finished");
+						c[i].p.runEnd = System.nanoTime();
+						ShortTermLoader.DataSwap(mgr, c[i], 1, 0);
+						MemoryDump.MemDump(sch.disk, mgr, c[i].p);
+						PCB temp = rq.pop();
+						LoadData(c[i], temp, temp.numPages);
+						c[i].go();
+					}
+					else
+					{
+						c[i].p.runEnd = System.nanoTime();
+						ShortTermLoader.DataSwap(mgr, c[i], 1, 0);
+						PCB temp = rq.pop();
+						LoadData(c[i], temp, temp.numPages);
+						c[i].go();
+					}
 					
 				}
 				i++;
@@ -77,9 +102,8 @@ public class Dispatcher {
 				if (!c[i].t.isAlive())
 				{
 					//threadMessage("CPU " + i + " is done");
-					doneIndex = i;
-					ShortTermLoader.DataSwap(mgr, c[doneIndex], 1, 0);
-					MemoryDump.MemDump(sch.disk, mgr, c[doneIndex].p);
+					ShortTermLoader.DataSwap(mgr, c[i], 1, 0);
+					MemoryDump.MemDump(sch.disk, mgr, c[i].p);
 					CPUDone = true;
 				}
 			}
@@ -93,15 +117,16 @@ public class Dispatcher {
 	 * @param p
 	 * @param index
 	 */
-	private void LoadData(CPU comp, PCB p, int i, int num) throws InterruptedException
+	private void LoadData(CPU comp, PCB p, int num) throws InterruptedException
 	{
 		p.readyEnd = System.nanoTime();
 		comp.p = p;
+		p.running = true;
 //		comp.alpha = p.base_Register;
 //		comp.omega = comp.alpha + p.totalSize;
 		ShortTermLoader.DataSwap(mgr, comp, 0, num);
 		//threadMessage("Starting CPU " + i);
-		comp.go();
+		//comp.go();
 		
 	}
 }

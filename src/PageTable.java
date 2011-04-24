@@ -10,11 +10,15 @@
 public class PageTable {
 
 	int [][] pTable;
+	int numPagesRemain;
+	int tblPtr;
 	
 	
 	public PageTable()
 	{
 		pTable = new int[256][2]; //One index for each frame in memory, with a valid/invalid bit, a modified bit
+		numPagesRemain = 256;
+		tblPtr = 0;
 	}
 	
 	public void PrintTable()

@@ -32,7 +32,10 @@ public class PCB {
 	int numPages; // number of frames for instruction space
 	int ioFrame; // address of instructions for I/O requests
 	int ioOffset;
-	int[] curInst;
+	int[] readInst; // current decoded instruction
+	char[] writeInst; // output number 
+	boolean finished = false;
+	boolean running = false;
 	
 	long runTime; // Length of time job was on CPU
 	long readyTime; // Length of time on ready queue
@@ -42,6 +45,11 @@ public class PCB {
 	long readyEnd;
 	
 	// TODO Add remaining PCB attributes
+	
+	public PCB(PageTable pTable)
+	{
+		p = pTable;
+	}
 	
 	public String toString()
 	{

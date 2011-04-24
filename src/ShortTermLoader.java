@@ -27,27 +27,45 @@ public class ShortTermLoader {
 			for (int i=0; i<num; i++)
 			{
 				if (pc.p.pages[i] != -1)
+				{
 					if (pc.p.p.pTable[pc.p.pages[i]][0] == 1)
 						pc.cache[i] = mgr.ReadFrame(pc.p.base_Register + i).clone();
+				}
+				else
+					break;
 			}
 			for (int i=0; i<5; i++)
 			{
 				if (pc.p.pages[pc.p.numPages+i] != -1)
+				{
 					if (pc.p.p.pTable[pc.p.pages[pc.p.numPages+i]][0] == 1)
 						pc.inputCache[i] = mgr.ReadFrame(pc.p.pages[pc.p.numPages+i]);
+				}
+				else
+					break;
 			}
 			for (int i=0; i<3; i++)
 			{
 				if (pc.p.pages[pc.p.numPages+5+i] != -1)
+				{
 					if (pc.p.p.pTable[pc.p.pages[pc.p.numPages+5+i]][0] == 1)
 						pc.inputCache[i] = mgr.ReadFrame(pc.p.pages[pc.p.numPages+5+i]);
+				}
+				else
+					break;
 			}
 		}
 		else
 		{
-			for (int i=0; i<pc.p.numChange; i++)
+			for (int i=0; i<3; i++)
 			{
-				mgr.WriteFrame(pc.p.base_Register + pc.p.changeIndex[i], pc.outputCache[pc.p.changeIndex[i]].clone());
+				if (pc.p.pages[pc.p.numPages+5+i] != -1)
+				{
+					if (pc.p.p.pTable[pc.p.pages[pc.p.numPages+5+i]][1] == 1)
+						mgr.WriteFrame(pc.p.pages[pc.p.numPages+5+i], pc.outputCache[i].clone());
+				}
+				else
+					break;
 			}
 		}
 		return true;

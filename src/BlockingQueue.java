@@ -16,7 +16,7 @@ public class BlockingQueue {
     queue (on most VMs).
    */
   private final PCB[] arr = new PCB[30];
-  private int last = 0;
+  private int last = -1;
   /**
     This method pushes an object onto the end of the queue, and
     then notifies one of the waiting threads.
@@ -24,7 +24,8 @@ public class BlockingQueue {
   public void push(PCB p) {
     synchronized(arr) {
     	//Dispatcher.threadMessage("push called");
-      arr[last++] = p;
+      arr[++last] = p;
+     // Dispatcher.threadMessage("Queue has " + last + " items");
       arr.notify();
     }
   }
@@ -38,9 +39,12 @@ public class BlockingQueue {
     	//Dispatcher.threadMessage("pop called");
      // Dispatcher.threadMessage("done waiting");
       PCB temp = arr[0];
-      last--;
+      //Dispatcher.threadMessage("Last item at " + last);
       for (int i=0; i<last; i++)
     	  arr[i] = arr[i+1];
+      last--;
+      //Dispatcher.threadMessage("Queue has " + last + " items");
+      arr.notify();
       return temp;
     }
   }
@@ -50,7 +54,7 @@ public class BlockingQueue {
   }
   
   public boolean isEmpty() {
-	  if (last == 0)
+	  if (last == -1)
 		  return true;
 	  else
 		  return false;
@@ -59,7 +63,10 @@ public class BlockingQueue {
    * Calls the sorting method on the inner array
    */
   public void sort() {
+	  synchronized(arr) {
 	  mergeSort();
+	  arr.notify();
+	  }
   }
   
   /**
