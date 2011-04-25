@@ -32,6 +32,7 @@ public class Scheduler {
 		for (i=0; i<30; i++)
 			rq.push(p[i]);
 		rq.sort();
+		//System.out.println("Ready Queue has size of " + rq.size());
 //		for (i=0; i<rq.length; i++)
 //			System.out.println(rq[i]);
 		j=0;
@@ -44,14 +45,6 @@ public class Scheduler {
 			pT.pTable[j++][1] = 0;
 			mgr.WriteFrame(j, disk[p[i].beginIndex+1]);
 			p[i].pages[1 ]= j;
-			pT.pTable[j][0] = 1;
-			pT.pTable[j++][1] = 0;
-			mgr.WriteFrame(j, disk[p[i].beginIndex+2]);
-			p[i].pages[2] = j;
-			pT.pTable[j][0] = 1;
-			pT.pTable[j++][1] = 0;
-			mgr.WriteFrame(j, disk[p[i].beginIndex+3]);
-			p[i].pages[3] = j;
 			pT.pTable[j][0] = 1;
 			pT.pTable[j++][1] = 0;
 			mgr.WriteFrame(j, disk[p[i].inputPage]);

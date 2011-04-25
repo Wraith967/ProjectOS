@@ -52,6 +52,7 @@ public class Execute {
 			pc.p.ioOffset = offset;
 			pc.p.readInst = c;
 			read.push(pc.p);
+			pc.p.running = false;
 			pc.t.interrupt();
 			break;
 		case 1:
@@ -74,7 +75,8 @@ public class Execute {
 			pc.p.ioFrame = address;
 			pc.p.ioOffset = offset;
 			pc.p.writeInst = inst.clone();
-			write.push(pc.p);			
+			write.push(pc.p);
+			pc.p.running = false;
 			pc.t.interrupt();
 			break;
 		case 2:
@@ -86,10 +88,8 @@ public class Execute {
 				inst[i] = '0';
 			for (j=0; j<hexArr.length; j++)
 				inst[i+j] = hexArr[j];
-			if (c[4]==0)
-				address = EffectiveAddress.DirectAddress(0,pc.p.registerBank[c[3]]);
-			else
-				address = EffectiveAddress.DirectAddress(0, c[4]);
+			address = EffectiveAddress.DirectAddress(0,pc.p.registerBank[c[3]]);
+			//Dispatcher.threadMessage("Storing at " + address);
 			address -= (pc.p.codeSize + 32);
 			offset = address % 4;
 			address = address / 4;
@@ -97,11 +97,8 @@ public class Execute {
 			break;
 		case 3:
 			//System.out.println("LW" + " " + c[2] + " " + c[3] + " " + c[4]);
-			sum = 0;
-			if (c[4]==0)
-				address = EffectiveAddress.DirectAddress(0,pc.p.registerBank[c[3]]);
-			else
-				address = EffectiveAddress.DirectAddress(0, c[4]);
+			address = EffectiveAddress.DirectAddress(0,pc.p.registerBank[c[2]]);
+			//Dispatcher.threadMessage("Loading from " + address);
 			address -= (pc.p.codeSize + 32);
 			offset = address % 4;
 			address = address / 4;
@@ -180,44 +177,73 @@ public class Execute {
 				pc.p.registerBank[c[3]]=0;
 			break;
 		case 18:
-			//System.out.println("HLT" + " " + c[2] + " " + c[3] + " " + c[4]);
-			pc.p.PC = pc.p.codeSize; // Force PC to end of job
-			pc.p.runEnd = System.nanoTime();
+			System.out.println("HLT" + " " + c[2] + " " + c[3] + " " + c[4]);
+			address = pc.p.codeSize;
+			pc.p.PC = address % 4;
+			pc.p.FC = address / 4; // Force PC to end of job
+			//pc.p.runEnd = System.nanoTime();
+			pc.p.finished = true;
 			pc.t.interrupt();
 			break;
 		case 20:
 			//System.out.println("JMP" + " " + c[2] + " " + c[3] + " " + c[4]);
-			pc.p.PC = EffectiveAddress.DirectAddress(0, c[2]);
+			address = EffectiveAddress.DirectAddress(0, c[2]);
+			pc.p.PC = address % 4;
+			pc.p.FC = address / 4;
 			break;
 		case 21:
 			//System.out.println("BEQ" + " " + c[2] + " " + c[3] + " " + c[4]);
 			if (pc.p.registerBank[c[2]] == pc.p.registerBank[c[3]])
-				pc.p.PC = EffectiveAddress.DirectAddress(0, c[4]);
+			{
+				address = EffectiveAddress.DirectAddress(0, c[4]);
+				pc.p.PC = address % 4;
+				pc.p.FC = address / 4;
+			}
 			break;
 		case 22:
 			//System.out.println("BNE" + " " + c[2] + " " + c[3] + " " + c[4]);
 			if (pc.p.registerBank[c[2]] != pc.p.registerBank[c[3]])
-				pc.p.PC = EffectiveAddress.DirectAddress(0, c[4]);
+			{
+				address = EffectiveAddress.DirectAddress(0, c[4]);
+				pc.p.PC = address % 4;
+				pc.p.FC = address / 4;
+			}
 			break;
 		case 23:
 			//System.out.println("BEZ" + " " + c[2] + " " + c[3] + " " + c[4]);
 			if (pc.p.registerBank[c[3]] == 0)
-				pc.p.PC = EffectiveAddress.DirectAddress(0, c[4]);
+			{
+				address = EffectiveAddress.DirectAddress(0, c[4]);
+				pc.p.PC = address % 4;
+				pc.p.FC = address / 4;
+			}
 			break;
 		case 24:
 			//System.out.println("BNZ" + " " + c[2] + " " + c[3] + " " + c[4]);
 			if (pc.p.registerBank[c[2]] != 0)
-				pc.p.PC = EffectiveAddress.DirectAddress(0, c[4]);
+			{
+				address = EffectiveAddress.DirectAddress(0, c[4]);
+				pc.p.PC = address % 4;
+				pc.p.FC = address / 4;
+			}
 			break;
 		case 25:
 			//System.out.println("BGZ" + " " + c[2] + " " + c[3] + " " + c[4]);
 			if (pc.p.registerBank[c[2]] > 0)
-				pc.p.PC = EffectiveAddress.DirectAddress(0, c[4]);
+			{
+				address = EffectiveAddress.DirectAddress(0, c[4]);
+				pc.p.PC = address % 4;
+				pc.p.FC = address / 4;
+			}
 			break;
 		case 26:
 			//System.out.println("BLZ" + " " + c[2] + " " + c[3] + " " + c[4]);
 			if (pc.p.registerBank[c[2]] < 0)
-				pc.p.PC = EffectiveAddress.DirectAddress(0, c[4]);
+			{
+				address = EffectiveAddress.DirectAddress(0, c[4]);
+				pc.p.PC = address % 4;
+				pc.p.FC = address / 4;
+			}
 			break;
 		}
 		pc.p.PC++;

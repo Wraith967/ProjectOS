@@ -53,38 +53,26 @@ public class Dispatcher {
 		i = 0;
 		while (!read.isEmpty() || !write.isEmpty() || !rq.isEmpty())
 		{
+			//threadMessage("Queues not empty");
 			while (!rq.isEmpty())
 			{
+				//threadMessage("Ready Queue not empty");
 				if (!c[i].t.isAlive())
 				{
-					if (c[i].p.running)
+					if (c[i].p.finished)
 					{
-						if(!(PH.LoadInstPage(c[i].p)))
-						{
-							c[i].p.runEnd = System.nanoTime();
-							ShortTermLoader.DataSwap(mgr, c[i], 1, 0);
-							PCB temp = rq.pop();
-							rq.push(c[i].p);
-							LoadData(c[i], temp, temp.numPages);
-							c[i].go();
-						}
-						else
-							c[i].go();
-					}
-					else if (c[i].p.finished)
-					{
-						threadMessage("Job finished");
-						c[i].p.runEnd = System.nanoTime();
-						ShortTermLoader.DataSwap(mgr, c[i], 1, 0);
-						MemoryDump.MemDump(sch.disk, mgr, c[i].p);
+						//threadMessage("Job finished");
+						//c[i].p.runEnd = System.nanoTime();
+						MemoryDump.MemDump(sch.disk, mgr, c[i].p, PH);
 						PCB temp = rq.pop();
 						LoadData(c[i], temp, temp.numPages);
 						c[i].go();
 					}
 					else
 					{
-						c[i].p.runEnd = System.nanoTime();
-						ShortTermLoader.DataSwap(mgr, c[i], 1, 0);
+						//threadMessage("Loading new job");
+						//c[i].p.runEnd = System.nanoTime();
+						rq.push(c[i].p);
 						PCB temp = rq.pop();
 						LoadData(c[i], temp, temp.numPages);
 						c[i].go();
@@ -101,9 +89,8 @@ public class Dispatcher {
 			{
 				if (!c[i].t.isAlive())
 				{
-					//threadMessage("CPU " + i + " is done");
-					ShortTermLoader.DataSwap(mgr, c[i], 1, 0);
-					MemoryDump.MemDump(sch.disk, mgr, c[i].p);
+					threadMessage("CPU " + i + " is done");
+					MemoryDump.MemDump(sch.disk, mgr, c[i].p, PH);
 					CPUDone = true;
 				}
 			}
@@ -120,11 +107,12 @@ public class Dispatcher {
 	private void LoadData(CPU comp, PCB p, int num) throws InterruptedException
 	{
 		p.readyEnd = System.nanoTime();
+		//threadMessage("Loading job " + p.jobID);
 		comp.p = p;
 		p.running = true;
 //		comp.alpha = p.base_Register;
 //		comp.omega = comp.alpha + p.totalSize;
-		ShortTermLoader.DataSwap(mgr, comp, 0, num);
+		ShortTermLoader.DataSwap(mgr, comp, num);
 		//threadMessage("Starting CPU " + i);
 		//comp.go();
 		

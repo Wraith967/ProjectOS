@@ -10,8 +10,6 @@
 public class CPU implements Runnable{
 	
 	char[][][] cache; // Interior CPU cache
-	char[][][] inputCache;
-	char[][][] outputCache;
 	char[][][] tempCache;
 	static int cpuNum; // Total number of CPUs created
 	int cpuID; // Unique ID for each CPU
@@ -23,12 +21,11 @@ public class CPU implements Runnable{
 	//int alpha, omega; // begin/end indices for memory usage
 	PCB p;
 	Thread t;
+	PageHandler PH;
 	
-	public CPU(MemoryManager mgr, BlockingQueue read, BlockingQueue write)
+	public CPU(MemoryManager mgr, BlockingQueue read, BlockingQueue write, PageHandler p)
 	{
 		cache = new char[7][4][8]; // 72 is maximum total length 
-		inputCache = new char[5][4][8];
-		outputCache = new char[3][4][8];
 		tempCache = new char[3][4][8];
 		dec = new Decode();
 		exe = new Execute(this, mgr, read, write);
@@ -36,7 +33,7 @@ public class CPU implements Runnable{
 		this.mgr = mgr;
 		cpuID = cpuNum++;
 		decodeInst = new int[5];
-		
+		PH = p;
 	}
 	
 	public void go()
@@ -48,16 +45,24 @@ public class CPU implements Runnable{
 	public void run()
 	{
 		//p.runStart = System.nanoTime();
-		Dispatcher.threadMessage("working");
+		//Dispatcher.threadMessage("working");
+		p.running = true;
 		while (true)
 		{
 			if (t.isInterrupted())
 				break;
 			if (p.pages[p.FC] == -1)
 			{
-				Dispatcher.threadMessage("Need more pages");
+				synchronized(PH){
+					if(!(PH.LoadInstPage(p)))
+					{
+						p.running = false;
+						t.interrupt();
+					}
+					PH.notify();
+				}
+				//Dispatcher.threadMessage("Need more pages, FC at " + p.FC);
 				//Dispatcher.threadMessage("Interrupt status: " + t.isInterrupted());
-				t.interrupt();
 			}
 			else
 			{
@@ -68,5 +73,6 @@ public class CPU implements Runnable{
 			}
 		}
 		//p.runEnd = System.nanoTime();
-	}	
+	}
+
 }

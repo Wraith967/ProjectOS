@@ -9,16 +9,24 @@
  */
 public class MemoryDump {
 	
-	public static void MemDump(char[][][] disk, MemoryManager mgr, PCB p)
+	public static void MemDump(char[][][] disk, MemoryManager mgr, PCB p, PageHandler PH)
 	{
-		int size = p.totalSize;
+		Dispatcher.threadMessage("Memory Dump called on job " + p.jobID);
+		int size = p.totalSize-12;
 		if (size%4 !=0)
-			size = size%4 + 1;
+			size = size/4 + 1;
 		else
-			size = size%4;
+			size = size/4;
+		System.out.println("Dumping at size " + size);
 		for (int i=0; i<size; i++)
 		{
-			disk[p.beginIndex+i] = mgr.ReadFrame(p.pages[i]).clone();
+			if (p.pages[i] != -1)
+			{
+				System.out.println("Dumping page " + i);
+				disk[p.beginIndex+i] = mgr.ReadFrame(p.pages[i]).clone();
+				//System.out.println(disk[p.beginIndex+i]);
+			}
 		}
+		PH.UnLoadFrames(p);
 	}
 }

@@ -15,47 +15,63 @@ public class DMAChannel implements Runnable{
 	int power, sum;
 	char[] inst;
 	MemoryManager mgr;
+	PageHandler PH;
 	
-	public DMAChannel(BlockingQueue r, BlockingQueue w, BlockingQueue rdy, MemoryManager m)
+	public DMAChannel(BlockingQueue r, BlockingQueue w, BlockingQueue rdy, MemoryManager m, PageHandler p)
 	{
 		address = 0;
 		read = r;
 		write = w;
 		this.rdy = rdy;
 		mgr = m;
+		PH = p;
 	}
 	
 	public void Read() throws InterruptedException
 	{
 		PCB temp = read.pop();
-		Dispatcher.threadMessage("Read called for PCB: " + temp.jobID + " at FC: " + temp.FC + " at PC: " + temp.PC);
+		//Dispatcher.threadMessage("Read called for PCB: " + temp.jobID + " at FC: " + temp.FC + " at PC: " + temp.PC);
 		sum = 0;
 		//Dispatcher.threadMessage("Reading with numPages = " + temp.numPages + " and ioFrame = " + temp.ioFrame);
-		inst = mgr.ReadFrame(temp.pages[temp.numPages+temp.ioFrame])[temp.ioOffset];
-		for (int i=0; i<8; i++)
+		if (temp.pages[temp.numPages+temp.ioFrame] != -1)
 		{
-			power = 1;
-			for (int j=0; j<7-i; j++)
+			inst = mgr.ReadFrame(temp.pages[temp.numPages+temp.ioFrame])[temp.ioOffset];
+			for (int i=0; i<8; i++)
 			{
-				power *=16;
+				power = 1;
+				for (int j=0; j<7-i; j++)
+				{
+					power *=16;
+				}
+				sum += (HexToInt.convertHextoInt(inst[i]))*power;
 			}
-			sum += (HexToInt.convertHextoInt(inst[i]))*power;
+			temp.registerBank[temp.readInst[2]] = sum;
+			rdy.push(temp);
+			rdy.sort();
 		}
-		temp.registerBank[temp.readInst[2]] = sum;
-		rdy.push(temp);
-		rdy.sort();		
+		else
+		{
+			PH.LoadInputPage(temp);
+		}
 	}
 	
 	public void Write() throws InterruptedException
 	{
 		PCB temp = write.pop();
-		Dispatcher.threadMessage("Read called for PCB: " + temp.jobID + " at FC: " + temp.FC + " at PC: " + temp.PC);
-		char [][] tempF = mgr.ReadFrame(temp.pages[temp.numPages+temp.ioFrame]);
-		tempF[temp.ioOffset] = temp.writeInst;
-		mgr.WriteFrame(temp.pages[temp.numPages+temp.ioFrame], tempF);
-		temp.p.pTable[temp.pages[temp.numPages+temp.ioFrame]][1] = 1;
-		rdy.push(temp);
-		rdy.sort();
+		if (temp.pages[temp.numPages+temp.ioFrame] != -1)
+		{
+			//Dispatcher.threadMessage("Write called for PCB: " + temp.jobID + " at FC: " + temp.FC + " at PC: " + temp.PC);
+			char [][] tempF = mgr.ReadFrame(temp.pages[temp.numPages+temp.ioFrame]);
+			tempF[temp.ioOffset] = temp.writeInst;
+			mgr.WriteFrame(temp.pages[temp.numPages+temp.ioFrame], tempF);
+			temp.p.pTable[temp.pages[temp.numPages+temp.ioFrame]][1] = 1;
+			rdy.push(temp);
+			rdy.sort();
+		}
+		else
+		{
+			PH.LoadOutputPage(temp);
+		}			
 	}
 
 	public void go()

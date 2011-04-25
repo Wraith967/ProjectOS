@@ -40,12 +40,12 @@ public class OSDriver {
 		//Modules
 		Loader control = new Loader(); // handles reading in and parsing of all instructions
 		MemoryManager mgr = new MemoryManager(); // handles RAM
-		DMAChannel dm = new DMAChannel(readQueue, writeQueue, readyQueue, mgr); // handles I/O requests
+		PageHandler PH = new PageHandler(PTable, mgr, disk);
+		DMAChannel dm = new DMAChannel(readQueue, writeQueue, readyQueue, mgr, PH); // handles I/O requests
 		Scheduler sched = new Scheduler(mgr, disk, PCBarr, readyQueue); // moves job to CPU
 		CPU[] comp = new CPU[4]; // handles processing
 		for (int i=0; i<4; i++)
-			comp[i] = new CPU(mgr, readQueue, writeQueue);
-		PageHandler PH = new PageHandler(PTable, mgr, disk);
+			comp[i] = new CPU(mgr, readQueue, writeQueue, PH);
 		Dispatcher disp = new Dispatcher(mgr, sched, comp, PCBarr, readyQueue, readQueue, writeQueue); // moves job data to CPU
 		
 		//Method Calls
@@ -62,8 +62,8 @@ public class OSDriver {
 		}
 		else
 		{
-			//sched.LoadMulti(PTable);
-			//disp.MultiDispatch(PH);
+			sched.LoadMulti(PTable);
+			disp.MultiDispatch(PH);
 		}
 		dm.kill();
 		runEnd = System.nanoTime();

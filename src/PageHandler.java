@@ -21,10 +21,24 @@ public class PageHandler {
 		ptr = -1;
 	}
 	
+	public void UnLoadFrames(PCB p)
+	{
+		Dispatcher.threadMessage("Unloading job");
+		for (int i=0; i<p.numPages+8; i++)
+		{
+			if (p.pages[i] != -1)
+			{
+				pT.pTable[p.pages[i]][0] = 0;
+				pT.pTable[p.pages[i]][1] = 0;
+				pT.numPagesRemain++;
+			}
+		}
+	}
+	
 	public boolean LoadInstPage(PCB p)
 	{
-		//Dispatcher.threadMessage("Pages Remaining = " + pT.numPagesRemain);
-		if (pT.numPagesRemain !=0)
+		Dispatcher.threadMessage("Pages Remaining = " + pT.numPagesRemain);
+		if (pT.numPagesRemain > 0)
 		{
 			for (int i=0; i<p.numPages; i++)
 			{
@@ -36,6 +50,7 @@ public class PageHandler {
 			}
 			if (ptr != -1)
 			{
+				Dispatcher.threadMessage("ptr found at " + ptr);
 				mgr.WriteFrame(pT.tblPtr, disk[p.beginIndex+ptr]);
 				p.pages[ptr] = pT.tblPtr++;
 				pT.numPagesRemain--;
@@ -48,6 +63,7 @@ public class PageHandler {
 	
 	public boolean LoadInputPage(PCB p)
 	{
+		Dispatcher.threadMessage("Loading Input");
 		if (pT.numPagesRemain !=0)
 		{
 			for (int i=0; i<5; i++)
@@ -72,6 +88,7 @@ public class PageHandler {
 	
 	public boolean LoadOutputPage(PCB p)
 	{
+		Dispatcher.threadMessage("Loading Output");
 		if (pT.numPagesRemain !=0)
 		{
 			for (int i=0; i<4; i++)

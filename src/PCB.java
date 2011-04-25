@@ -25,8 +25,6 @@ public class PCB {
 	int totalSize; // Total job space required
 	int count; // Number of I/O requests made
 	int[] registerBank = new int[16];
-	int[] changeIndex = new int[3]; // addresses of changes to memory
-	int numChange; // amount of changes
 	PageTable p;
 	int[] pages; // holds addresses of frames in page table
 	int numPages; // number of frames for instruction space

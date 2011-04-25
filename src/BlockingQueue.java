@@ -1,3 +1,5 @@
+import java.util.ArrayList;
+
 /**
  * 
  */
@@ -15,8 +17,7 @@ public class BlockingQueue {
     although an ArrayList is usually more efficient for a short
     queue (on most VMs).
    */
-  private final PCB[] arr = new PCB[30];
-  private int last = -1;
+  private final ArrayList<PCB> arr = new ArrayList<PCB>();
   /**
     This method pushes an object onto the end of the queue, and
     then notifies one of the waiting threads.
@@ -24,7 +25,7 @@ public class BlockingQueue {
   public void push(PCB p) {
     synchronized(arr) {
     	//Dispatcher.threadMessage("push called");
-      arr[++last] = p;
+      arr.add(p);
      // Dispatcher.threadMessage("Queue has " + last + " items");
       arr.notify();
     }
@@ -37,27 +38,18 @@ public class BlockingQueue {
   public PCB pop() throws InterruptedException {
     synchronized(arr) {
     	//Dispatcher.threadMessage("pop called");
-     // Dispatcher.threadMessage("done waiting");
-      PCB temp = arr[0];
-      //Dispatcher.threadMessage("Last item at " + last);
-      for (int i=0; i<last; i++)
-    	  arr[i] = arr[i+1];
-      last--;
-      //Dispatcher.threadMessage("Queue has " + last + " items");
-      arr.notify();
-      return temp;
+    	PCB temp = arr.remove(0);
+    	arr.notify();
+    	return temp;
     }
   }
   /** Return the number of elements currently in the queue. */
   public int size() {
-    return last;
+    return arr.size();
   }
   
   public boolean isEmpty() {
-	  if (last == -1)
-		  return true;
-	  else
-		  return false;
+	  return arr.isEmpty();
   }
   /**
    * Calls the sorting method on the inner array
@@ -73,8 +65,8 @@ public class BlockingQueue {
    * Mergesort algorithm.
    */
   private void mergeSort() {
-      PCB [] tmpArray = new PCB[ last ];
-      mergeSort( tmpArray, 0, last - 1 );
+      ArrayList<PCB> tmpArray = new ArrayList<PCB>();
+      mergeSort( tmpArray, 0, arr.size() - 1 );
   }
   
   /**
@@ -83,7 +75,7 @@ public class BlockingQueue {
    * @param left the left-most index of the subarray.
    * @param right the right-most index of the subarray.
    */
-  private void mergeSort( PCB [ ] tmpArray,
+  private void mergeSort( ArrayList<PCB> tmpArray,
           int left, int right ) {
       if( left < right ) {
           int center = ( left + right ) / 2;
@@ -100,7 +92,7 @@ public class BlockingQueue {
    * @param rightPos the index of the start of the second half.
    * @param rightEnd the right-most index of the subarray.
    */
-  private void merge( PCB [ ] tmpArray,
+  private void merge( ArrayList<PCB> tmpArray,
           int leftPos, int rightPos, int rightEnd ) {
       int leftEnd = rightPos - 1;
       int tmpPos = leftPos;
@@ -108,20 +100,20 @@ public class BlockingQueue {
       
       // Main loop
       while( leftPos <= leftEnd && rightPos <= rightEnd )
-          if( arr[leftPos].codeSize < arr[rightPos].codeSize  )
+          if( arr.get(leftPos).codeSize < arr.get(rightPos).codeSize  )
       	//if( arr[leftPos].priority > arr[rightPos].priority  )
-              tmpArray[ tmpPos++ ] = arr[ leftPos++ ];
+              tmpArray.add(tmpPos++,arr.get(leftPos++));
           else
-              tmpArray[ tmpPos++ ] = arr[ rightPos++ ];
+              tmpArray.add(tmpPos++,arr.get(rightPos++));
       
       while( leftPos <= leftEnd )    // Copy rest of first half
-          tmpArray[ tmpPos++ ] = arr[ leftPos++ ];
+          tmpArray.add(tmpPos++, arr.get(leftPos++));
       
       while( rightPos <= rightEnd )  // Copy rest of right half
-          tmpArray[ tmpPos++ ] = arr[ rightPos++ ];
+          tmpArray.add(tmpPos++, arr.get(rightPos++));
       
       // Copy tmpArray back
       for( int i = 0; i < numElements; i++, rightEnd-- )
-          arr[ rightEnd ] = tmpArray[ rightEnd ];
+          arr.set(rightEnd, tmpArray.get(rightEnd));
   }
 }
