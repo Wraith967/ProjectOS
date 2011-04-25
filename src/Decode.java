@@ -24,8 +24,13 @@ public class Decode {
 	 */
 	public int[] DecodeInst(char[] a)
 	{
+		String msg = "";
 		for (int i=0; i<8; i++)
+		{
+			msg += a[i];
 			converted[i] = HexToInt.convertHextoInt(a[i]);
+		}
+		//Dispatcher.threadMessage("Decoder called on " + msg);
 		switch (converted[0])
 		{
 			case 0:

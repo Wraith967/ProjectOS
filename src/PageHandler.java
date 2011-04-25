@@ -34,31 +34,83 @@ public class PageHandler {
 			}
 		}
 	}
-	
-	public boolean LoadInstPage(PCB p)
+
+	private void UpdatePtr()
 	{
-		Dispatcher.threadMessage("Pages Remaining = " + pT.numPagesRemain);
-		if (pT.numPagesRemain > 0)
-		{
-			for (int i=0; i<p.numPages; i++)
+		synchronized(pT){
+			//Dispatcher.threadMessage("Updating ptr at " + pT.tblPtr);
+			boolean found = false;
+			for (int i=pT.tblPtr; i<256; i++)
 			{
-				if (p.pages[i] == -1)
+				//Dispatcher.threadMessage("Checking for ptr at " + i + " with valid bit of " + pT.pTable[pT.tblPtr][0]);
+				if (pT.pTable[i][0] == 0)
 				{
-					ptr = i;
+					//Dispatcher.threadMessage("Ptr found at " + i);
+					pT.tblPtr = i;
+					found = true;
 					break;
 				}
 			}
-			if (ptr != -1)
+			if (!found)
 			{
-				Dispatcher.threadMessage("ptr found at " + ptr);
-				mgr.WriteFrame(pT.tblPtr, disk[p.beginIndex+ptr]);
-				p.pages[ptr] = pT.tblPtr++;
-				pT.numPagesRemain--;
+				for (int i=0; i<pT.tblPtr; i++)
+				{
+					if (pT.pTable[pT.tblPtr][0] == 0)
+					{
+						pT.tblPtr = i;
+						break;
+					}
+				}
 			}
-			return true;
+			//Dispatcher.threadMessage("ptr updated to: " + pT.tblPtr);
+			pT.notify();
 		}
-		else
-			return false;
+	}
+	
+	public boolean LoadInstPage(PCB p)
+	{
+		//Dispatcher.threadMessage("Pages Remaining = " + pT.numPagesRemain + " for job " + p.jobID);
+		synchronized(pT){
+			if (pT.numPagesRemain > 0)
+			{
+				for (int i=0; i<p.numPages; i++)
+				{
+					if (p.pages[i] == -1)
+					{
+						ptr = i;
+						break;
+					}
+				}
+				if (ptr != -1)
+				{
+					//Dispatcher.threadMessage("ptr found at " + ptr);
+					//Dispatcher.threadMessage("tblPtr found at " + pT.tblPtr);
+					mgr.WriteFrame(pT.tblPtr, disk[p.beginIndex+ptr]);
+//					String msg = "";
+//					char[][] temp = mgr.ReadFrame(pT.tblPtr);
+//					for (int i=0; i<4; i++)
+//					{
+//						for (int j=0; j<8; j++)
+//							msg += temp[i][j];
+//						msg += "\n";
+//					}
+//					Dispatcher.threadMessage("Moving Frame: " + msg);
+					pT.pTable[pT.tblPtr][0] = 1;
+					//Dispatcher.threadMessage("PageTable at " + (pT.tblPtr) + " = " + pT.pTable[pT.tblPtr][0] + pT.pTable[pT.tblPtr][1]);
+					//Dispatcher.threadMessage("PageTable at " + (pT.tblPtr+1) + " = " + pT.pTable[pT.tblPtr+1][0] + pT.pTable[pT.tblPtr+1][1]);
+					p.pages[ptr] = pT.tblPtr;
+					UpdatePtr();
+					pT.numPagesRemain--;
+				}
+				pT.notify();
+				return true;
+			}
+			else
+			{
+				pT.notify();
+				return false;
+			}
+		}
 	}
 	
 	public boolean LoadInputPage(PCB p)
@@ -77,7 +129,9 @@ public class PageHandler {
 			if (ptr > p.numPages)
 			{
 				mgr.WriteFrame(pT.tblPtr, disk[p.beginIndex+ptr+p.numPages]);
-				p.pages[ptr] = pT.tblPtr++;
+				pT.pTable[pT.tblPtr][0] = 1;
+				p.pages[ptr] = pT.tblPtr;
+				UpdatePtr();
 				pT.numPagesRemain--;
 			}
 			return true;
@@ -102,7 +156,9 @@ public class PageHandler {
 			if (ptr > p.numPages+5)
 			{
 				mgr.WriteFrame(pT.tblPtr, disk[p.beginIndex+ptr+p.numPages+5]);
-				p.pages[ptr] = pT.tblPtr++;
+				pT.pTable[pT.tblPtr][0] = 1;
+				p.pages[ptr] = pT.tblPtr;
+				UpdatePtr();
 				pT.numPagesRemain--;
 			}
 			return true;

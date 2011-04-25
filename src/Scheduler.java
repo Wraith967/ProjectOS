@@ -31,7 +31,8 @@ public class Scheduler {
 	{
 		for (i=0; i<30; i++)
 			rq.push(p[i]);
-		rq.sort();
+		//rq.sort();
+		rq.print();
 		//System.out.println("Ready Queue has size of " + rq.size());
 //		for (i=0; i<rq.length; i++)
 //			System.out.println(rq[i]);
@@ -60,7 +61,7 @@ public class Scheduler {
 		}
 		pT.tblPtr = j;
 		pT.numPagesRemain -= j;
-//		p[0].p.PrintTable();
+		//pT.PrintTable();
 //		for (i=0; i<j; i++)
 //			PrintMem(mgr.ReadFrame(i));
 	}

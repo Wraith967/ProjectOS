@@ -22,9 +22,12 @@ public class MemoryDump {
 		{
 			if (p.pages[i] != -1)
 			{
-				System.out.println("Dumping page " + i);
-				disk[p.beginIndex+i] = mgr.ReadFrame(p.pages[i]).clone();
-				//System.out.println(disk[p.beginIndex+i]);
+				if (p.p.pTable[p.pages[i]][1] == 1)
+				{
+					System.out.println("Dumping page " + i);
+					disk[p.beginIndex+i] = mgr.ReadFrame(p.pages[i]).clone();
+					//System.out.println(disk[p.beginIndex+i]);
+				}
 			}
 		}
 		PH.UnLoadFrames(p);

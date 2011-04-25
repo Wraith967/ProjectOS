@@ -24,7 +24,7 @@ public class BlockingQueue {
    */
   public void push(PCB p) {
     synchronized(arr) {
-    	//Dispatcher.threadMessage("push called");
+    	//Dispatcher.threadMessage(this.toString() + " push called on job " + p.jobID);
       arr.add(p);
      // Dispatcher.threadMessage("Queue has " + last + " items");
       arr.notify();
@@ -37,8 +37,8 @@ public class BlockingQueue {
    */
   public PCB pop() throws InterruptedException {
     synchronized(arr) {
-    	//Dispatcher.threadMessage("pop called");
     	PCB temp = arr.remove(0);
+    	//Dispatcher.threadMessage(this.toString() + " pop called on job " + temp.jobID);
     	arr.notify();
     	return temp;
     }
@@ -51,6 +51,20 @@ public class BlockingQueue {
   public boolean isEmpty() {
 	  return arr.isEmpty();
   }
+  
+  public void print()
+  {
+	  synchronized(arr)
+	  {
+		  for (int i=0; i<size(); i++)
+		  {
+			  System.out.print(arr.get(i).jobID + " ");
+		  }
+		  System.out.println();
+		  arr.notify();
+	  }
+  }
+  
   /**
    * Calls the sorting method on the inner array
    */

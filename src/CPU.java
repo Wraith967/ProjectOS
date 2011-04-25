@@ -45,31 +45,52 @@ public class CPU implements Runnable{
 	public void run()
 	{
 		//p.runStart = System.nanoTime();
-		//Dispatcher.threadMessage("working");
+		//Dispatcher.threadMessage("working on job " + p.jobID);
 		p.running = true;
 		while (true)
 		{
+			if ((p.FC < 0) || (p.FC >= p.numPages))
+			{
+				Dispatcher.threadMessage("Error with job " + p.jobID + " FC out of bounds");
+				p.finished = true;
+				p.running = false;
+				break;
+			}
+			//Dispatcher.threadMessage("Interrupt status: " + t.isInterrupted());
 			if (t.isInterrupted())
 				break;
-			if (p.pages[p.FC] == -1)
-			{
-				synchronized(PH){
-					if(!(PH.LoadInstPage(p)))
-					{
-						p.running = false;
-						t.interrupt();
-					}
-					PH.notify();
-				}
-				//Dispatcher.threadMessage("Need more pages, FC at " + p.FC);
-				//Dispatcher.threadMessage("Interrupt status: " + t.isInterrupted());
-			}
-			else
+			else if (p.pages[p.FC] != -1)
 			{
 				//Dispatcher.threadMessage("Reading instruction from: " + p.FC + " at " + p.PC);
 				inst = cache[p.FC][p.PC];
+				//Dispatcher.threadMessage("Current instruction " + inst.toString());
 				decodeInst = dec.DecodeInst(inst);
+				//Dispatcher.threadMessage("Decoder called");
 				exe.ExecInst(decodeInst);
+				//Dispatcher.threadMessage("Execute called " + exe.ExecInst(decodeInst));
+				if (!exe.jumped)
+				{
+					p.PC++;
+					if (p.PC == 4)
+					{
+						//Dispatcher.threadMessage("Rolling Frame Counter for job " + p.jobID);
+						p.PC = 0;
+						p.FC++;
+					}
+				}
+				else
+					Dispatcher.threadMessage("Jump instruction found");
+			}
+			else
+			{
+				//Dispatcher.threadMessage("Interrupt status: " + t.isInterrupted());
+				p.running = true;
+				//Dispatcher.threadMessage("Interrupting...");
+				t.interrupt();
+				//Dispatcher.threadMessage("Interrupt status: " + t.isInterrupted());
+				//Dispatcher.threadMessage("Job " + p.jobID + " needs more pages, FC at " + p.FC);
+				//Dispatcher.threadMessage("Interrupt status: " + t.isInterrupted());
+				
 			}
 		}
 		//p.runEnd = System.nanoTime();

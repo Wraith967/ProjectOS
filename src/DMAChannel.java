@@ -30,7 +30,7 @@ public class DMAChannel implements Runnable{
 	public void Read() throws InterruptedException
 	{
 		PCB temp = read.pop();
-		//Dispatcher.threadMessage("Read called for PCB: " + temp.jobID + " at FC: " + temp.FC + " at PC: " + temp.PC);
+		Dispatcher.threadMessage("Read called for PCB: " + temp.jobID + " at FC: " + temp.FC + " at PC: " + temp.PC);
 		sum = 0;
 		//Dispatcher.threadMessage("Reading with numPages = " + temp.numPages + " and ioFrame = " + temp.ioFrame);
 		if (temp.pages[temp.numPages+temp.ioFrame] != -1)
@@ -45,9 +45,10 @@ public class DMAChannel implements Runnable{
 				}
 				sum += (HexToInt.convertHextoInt(inst[i]))*power;
 			}
+			//Dispatcher.threadMessage("sum = " + sum + " for register " + temp.readInst[2]);
 			temp.registerBank[temp.readInst[2]] = sum;
 			rdy.push(temp);
-			rdy.sort();
+			//rdy.sort();
 		}
 		else
 		{
@@ -60,13 +61,29 @@ public class DMAChannel implements Runnable{
 		PCB temp = write.pop();
 		if (temp.pages[temp.numPages+temp.ioFrame] != -1)
 		{
-			//Dispatcher.threadMessage("Write called for PCB: " + temp.jobID + " at FC: " + temp.FC + " at PC: " + temp.PC);
+			Dispatcher.threadMessage("Write called for PCB: " + temp.jobID + " at FC: " + temp.FC + " at PC: " + temp.PC);
 			char [][] tempF = mgr.ReadFrame(temp.pages[temp.numPages+temp.ioFrame]);
+//			for (int i=0; i<4; i++)
+//			{
+//				for (int j=0; j<8; j++)
+//				{
+//					System.out.print(tempF[i][j]);
+//				}
+//				System.out.println();
+//			}
 			tempF[temp.ioOffset] = temp.writeInst;
+//			for (int i=0; i<4; i++)
+//			{
+//				for (int j=0; j<8; j++)
+//				{
+//					System.out.print(tempF[i][j]);
+//				}
+//				System.out.println();
+//			}
 			mgr.WriteFrame(temp.pages[temp.numPages+temp.ioFrame], tempF);
 			temp.p.pTable[temp.pages[temp.numPages+temp.ioFrame]][1] = 1;
 			rdy.push(temp);
-			rdy.sort();
+			//rdy.sort();
 		}
 		else
 		{

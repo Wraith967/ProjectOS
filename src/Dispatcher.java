@@ -44,7 +44,7 @@ public class Dispatcher {
 	{
 		isDone = false;
 		CPUDone = false;
-		for (int i=0; i<4; i++)
+		for (int i=0; i<1; i++)
 		{
 			LoadData(c[i], rq.pop(), 6);
 			c[i].go();
@@ -59,12 +59,33 @@ public class Dispatcher {
 				//threadMessage("Ready Queue not empty");
 				if (!c[i].t.isAlive())
 				{
-					if (c[i].p.finished)
+					if (c[i].p.running)
+					{
+						//threadMessage("Attempting to load new pages");
+						if(!(PH.LoadInstPage(c[i].p)))
+						{
+							//threadMessage("No pages left");
+							rq.push(c[i].p);
+							//rq.print();
+							PCB temp = rq.pop();
+							LoadData(c[i], temp, temp.numPages);
+							c[i].go();
+						}
+						else
+						{
+							//threadMessage("New page loaded, restarting");
+							ShortTermLoader.DataSwap(mgr, c[i], c[i].p.numPages);
+							c[i].go();
+						}
+					}
+					else if (c[i].p.finished)
 					{
 						//threadMessage("Job finished");
 						//c[i].p.runEnd = System.nanoTime();
 						MemoryDump.MemDump(sch.disk, mgr, c[i].p, PH);
+						//rq.print();
 						PCB temp = rq.pop();
+						threadMessage("Loading job " + temp.jobID);
 						LoadData(c[i], temp, temp.numPages);
 						c[i].go();
 					}
@@ -72,18 +93,19 @@ public class Dispatcher {
 					{
 						//threadMessage("Loading new job");
 						//c[i].p.runEnd = System.nanoTime();
-						rq.push(c[i].p);
+						//rq.push(c[i].p);
+						//rq.print();
 						PCB temp = rq.pop();
 						LoadData(c[i], temp, temp.numPages);
 						c[i].go();
 					}
 					
 				}
-				i++;
-				i %= 4;
+//				i++;
+//				i %= 4;
 			}
 		}
-		for (i=0; i<4; i++)
+		for (i=0; i<1; i++)
 		{
 			while (!CPUDone)
 			{
