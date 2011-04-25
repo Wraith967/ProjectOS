@@ -54,10 +54,11 @@ public class CPU implements Runnable{
 				Dispatcher.threadMessage("Error with job " + p.jobID + " FC out of bounds");
 				p.finished = true;
 				p.running = false;
+				t.interrupt();
 				break;
 			}
 			//Dispatcher.threadMessage("Interrupt status: " + t.isInterrupted());
-			if (t.isInterrupted())
+			else if (t.isInterrupted())
 				break;
 			else if (p.pages[p.FC] != -1)
 			{
@@ -78,8 +79,8 @@ public class CPU implements Runnable{
 						p.FC++;
 					}
 				}
-				else
-					Dispatcher.threadMessage("Jump instruction found");
+//				else
+//					Dispatcher.threadMessage("Jump instruction found");
 			}
 			else
 			{

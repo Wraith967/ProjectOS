@@ -25,9 +25,9 @@ public class Dispatcher {
 	int i;
 	CPU[] c;
 	PCB[] p;
-	BlockingQueue rq, read, write;
+	BlockingQueue rq, read, write, block;
 	
-	public Dispatcher(MemoryManager mgr, Scheduler sch, CPU[] c, PCB[] p, BlockingQueue rq, BlockingQueue r, BlockingQueue w)
+	public Dispatcher(MemoryManager mgr, Scheduler sch, CPU[] c, PCB[] p, BlockingQueue rq, BlockingQueue r, BlockingQueue w, BlockingQueue b)
 	{
 		this.mgr = mgr;
 		this.sch = sch;
@@ -38,13 +38,14 @@ public class Dispatcher {
 		this.rq = rq;
 		read = r;
 		write = w;
+		block = b;
 	}
 	
 	public void MultiDispatch(PageHandler PH) throws InterruptedException
 	{
 		isDone = false;
 		CPUDone = false;
-		for (int i=0; i<1; i++)
+		for (int i=0; i<4; i++)
 		{
 			LoadData(c[i], rq.pop(), 6);
 			c[i].go();
@@ -65,8 +66,9 @@ public class Dispatcher {
 						if(!(PH.LoadInstPage(c[i].p)))
 						{
 							//threadMessage("No pages left");
-							rq.push(c[i].p);
+							block.push(c[i].p);
 							//rq.print();
+							//threadMessage("Current size of ready queue " + rq.size());
 							PCB temp = rq.pop();
 							LoadData(c[i], temp, temp.numPages);
 							c[i].go();
@@ -83,35 +85,41 @@ public class Dispatcher {
 						//threadMessage("Job finished");
 						//c[i].p.runEnd = System.nanoTime();
 						MemoryDump.MemDump(sch.disk, mgr, c[i].p, PH);
+						if (!block.isEmpty())
+						{
+							//threadMessage("Offloading from blocked queue");
+							rq.push(block.pop());
+						}
 						//rq.print();
+						//threadMessage("Current size of ready queue " + rq.size());
 						PCB temp = rq.pop();
-						threadMessage("Loading job " + temp.jobID);
+						//threadMessage("Loading job " + temp.jobID);
 						LoadData(c[i], temp, temp.numPages);
 						c[i].go();
 					}
 					else
 					{
-						//threadMessage("Loading new job");
 						//c[i].p.runEnd = System.nanoTime();
 						//rq.push(c[i].p);
 						//rq.print();
+						//threadMessage("Current size of ready queue " + rq.size());
 						PCB temp = rq.pop();
 						LoadData(c[i], temp, temp.numPages);
 						c[i].go();
 					}
 					
 				}
-//				i++;
-//				i %= 4;
+				i++;
+				i %= 4;
 			}
 		}
-		for (i=0; i<1; i++)
+		for (i=0; i<4; i++)
 		{
 			while (!CPUDone)
 			{
 				if (!c[i].t.isAlive())
 				{
-					threadMessage("CPU " + i + " is done");
+					//threadMessage("CPU " + i + " is done");
 					MemoryDump.MemDump(sch.disk, mgr, c[i].p, PH);
 					CPUDone = true;
 				}

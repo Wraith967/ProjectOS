@@ -23,7 +23,7 @@ public class PageHandler {
 	
 	public void UnLoadFrames(PCB p)
 	{
-		Dispatcher.threadMessage("Unloading job");
+		//Dispatcher.threadMessage("Unloading job");
 		for (int i=0; i<p.numPages+8; i++)
 		{
 			if (p.pages[i] != -1)
@@ -115,7 +115,6 @@ public class PageHandler {
 	
 	public boolean LoadInputPage(PCB p)
 	{
-		Dispatcher.threadMessage("Loading Input");
 		if (pT.numPagesRemain !=0)
 		{
 			for (int i=0; i<5; i++)
@@ -126,14 +125,12 @@ public class PageHandler {
 					break;
 				}
 			}
-			if (ptr > p.numPages)
-			{
-				mgr.WriteFrame(pT.tblPtr, disk[p.beginIndex+ptr+p.numPages]);
-				pT.pTable[pT.tblPtr][0] = 1;
-				p.pages[ptr] = pT.tblPtr;
-				UpdatePtr();
-				pT.numPagesRemain--;
-			}
+			//Dispatcher.threadMessage("Loading Input for job " + p.jobID + " at ptr " + ptr);
+			mgr.WriteFrame(pT.tblPtr, disk[p.beginIndex+ptr+p.numPages]);
+			pT.pTable[pT.tblPtr][0] = 1;
+			p.pages[ptr] = pT.tblPtr;
+			UpdatePtr();
+			pT.numPagesRemain--;
 			return true;
 		}
 		else
@@ -142,25 +139,23 @@ public class PageHandler {
 	
 	public boolean LoadOutputPage(PCB p)
 	{
-		Dispatcher.threadMessage("Loading Output");
 		if (pT.numPagesRemain !=0)
 		{
 			for (int i=0; i<4; i++)
 			{
 				if (p.pages[p.numPages+5+i] == -1)
 				{
+					//Dispatcher.threadMessage("Output ptr found at " + i);
 					ptr = i;
 					break;
 				}
 			}
-			if (ptr > p.numPages+5)
-			{
-				mgr.WriteFrame(pT.tblPtr, disk[p.beginIndex+ptr+p.numPages+5]);
-				pT.pTable[pT.tblPtr][0] = 1;
-				p.pages[ptr] = pT.tblPtr;
-				UpdatePtr();
-				pT.numPagesRemain--;
-			}
+			//Dispatcher.threadMessage("Loading Output for job " + p.jobID + " at ptr " + ptr);
+			mgr.WriteFrame(pT.tblPtr, disk[p.beginIndex+ptr+p.numPages+5]);
+			pT.pTable[pT.tblPtr][0] = 1;
+			p.pages[ptr] = pT.tblPtr;
+			UpdatePtr();
+			pT.numPagesRemain--;
 			return true;
 		}
 		else

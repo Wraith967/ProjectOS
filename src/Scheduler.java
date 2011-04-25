@@ -31,8 +31,8 @@ public class Scheduler {
 	{
 		for (i=0; i<30; i++)
 			rq.push(p[i]);
-		//rq.sort();
-		rq.print();
+		rq.sort();
+		//rq.print();
 		//System.out.println("Ready Queue has size of " + rq.size());
 //		for (i=0; i<rq.length; i++)
 //			System.out.println(rq[i]);
@@ -58,6 +58,7 @@ public class Scheduler {
 			pT.pTable[j++][1] = 0;
 //			System.out.println(p[i].pages[p[i].numPages]);
 //			System.out.println(p[i].pages[p[i].numPages+5]);
+			p[i].readyStart = System.nanoTime();
 		}
 		pT.tblPtr = j;
 		pT.numPagesRemain -= j;

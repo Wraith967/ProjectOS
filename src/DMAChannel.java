@@ -30,12 +30,12 @@ public class DMAChannel implements Runnable{
 	public void Read() throws InterruptedException
 	{
 		PCB temp = read.pop();
-		Dispatcher.threadMessage("Read called for PCB: " + temp.jobID + " at FC: " + temp.FC + " at PC: " + temp.PC);
+		//Dispatcher.threadMessage("Read called for PCB: " + temp.jobID + " at FC: " + temp.FC + " at PC: " + temp.PC);
 		sum = 0;
-		//Dispatcher.threadMessage("Reading with numPages = " + temp.numPages + " and ioFrame = " + temp.ioFrame);
-		if (temp.pages[temp.numPages+temp.ioFrame] != -1)
+		Dispatcher.threadMessage("Reading with ioFrame = " + temp.ioFrame + " and ioOffset = " + temp.ioOffset);
+		if (temp.pages[temp.ioFrame] != -1)
 		{
-			inst = mgr.ReadFrame(temp.pages[temp.numPages+temp.ioFrame])[temp.ioOffset];
+			inst = mgr.ReadFrame(temp.pages[temp.ioFrame])[temp.ioOffset];
 			for (int i=0; i<8; i++)
 			{
 				power = 1;
@@ -47,8 +47,9 @@ public class DMAChannel implements Runnable{
 			}
 			//Dispatcher.threadMessage("sum = " + sum + " for register " + temp.readInst[2]);
 			temp.registerBank[temp.readInst[2]] = sum;
+			//Dispatcher.threadMessage("Current size of ready queue " + rdy.size());
 			rdy.push(temp);
-			//rdy.sort();
+			rdy.sort();
 		}
 		else
 		{
@@ -59,10 +60,12 @@ public class DMAChannel implements Runnable{
 	public void Write() throws InterruptedException
 	{
 		PCB temp = write.pop();
-		if (temp.pages[temp.numPages+temp.ioFrame] != -1)
+		//Dispatcher.threadMessage("Writing with ioFrame = " + temp.ioFrame + " and ioOffset = " + temp.ioOffset);
+		if (temp.pages[temp.ioFrame] != -1)
 		{
-			Dispatcher.threadMessage("Write called for PCB: " + temp.jobID + " at FC: " + temp.FC + " at PC: " + temp.PC);
-			char [][] tempF = mgr.ReadFrame(temp.pages[temp.numPages+temp.ioFrame]);
+			//Dispatcher.threadMessage("Write called for PCB: " + temp.jobID + " at FC: " + temp.FC + " at PC: " + temp.PC);
+			
+			char [][] tempF = mgr.ReadFrame(temp.pages[temp.ioFrame]);
 //			for (int i=0; i<4; i++)
 //			{
 //				for (int j=0; j<8; j++)
@@ -80,10 +83,11 @@ public class DMAChannel implements Runnable{
 //				}
 //				System.out.println();
 //			}
-			mgr.WriteFrame(temp.pages[temp.numPages+temp.ioFrame], tempF);
-			temp.p.pTable[temp.pages[temp.numPages+temp.ioFrame]][1] = 1;
+			mgr.WriteFrame(temp.pages[temp.ioFrame], tempF);
+			temp.p.pTable[temp.pages[temp.ioFrame]][1] = 1;
+			//Dispatcher.threadMessage("Current size of ready queue " + rdy.size());
 			rdy.push(temp);
-			//rdy.sort();
+			rdy.sort();
 		}
 		else
 		{

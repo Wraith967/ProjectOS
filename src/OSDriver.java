@@ -29,6 +29,7 @@ public class OSDriver {
 		BlockingQueue readyQueue = new BlockingQueue();
 		BlockingQueue readQueue = new BlockingQueue();
 		BlockingQueue writeQueue = new BlockingQueue();
+		BlockingQueue blockQueue = new BlockingQueue();
 		long avgRunTime=0, avgReadyTime=0;
 		long totalRunTime, runStart, runEnd;
 		String input, output;
@@ -43,10 +44,10 @@ public class OSDriver {
 		PageHandler PH = new PageHandler(PTable, mgr, disk);
 		DMAChannel dm = new DMAChannel(readQueue, writeQueue, readyQueue, mgr, PH); // handles I/O requests
 		Scheduler sched = new Scheduler(mgr, disk, PCBarr, readyQueue); // moves job to CPU
-		CPU[] comp = new CPU[1]; // handles processing
-		for (int i=0; i<1; i++)
+		CPU[] comp = new CPU[4]; // handles processing
+		for (int i=0; i<4; i++)
 			comp[i] = new CPU(mgr, readQueue, writeQueue, PH);
-		Dispatcher disp = new Dispatcher(mgr, sched, comp, PCBarr, readyQueue, readQueue, writeQueue); // moves job data to CPU
+		Dispatcher disp = new Dispatcher(mgr, sched, comp, PCBarr, readyQueue, readQueue, writeQueue, blockQueue); // moves job data to CPU
 		
 		//Method Calls
 		System.out.println("Name of input file:");

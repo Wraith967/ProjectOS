@@ -42,13 +42,16 @@ public class Execute {
 		switch (c[1])
 		{
 		case 0:
-			Dispatcher.threadMessage("RD" + " " + c[2] + " " + c[3] + " " + c[4]);
+			//Dispatcher.threadMessage("RD" + " " + c[2] + " " + c[3] + " " + c[4]);
 			pc.p.count++;
 			if (c[4]==0)
 				address = EffectiveAddress.DirectAddress(0,pc.p.registerBank[c[3]]);
 			else
 				address = EffectiveAddress.DirectAddress(0, c[4]);
-			address -= pc.p.codeSize;
+			if ((pc.p.codeSize %4) != 0)
+			{
+				address++;
+			}
 			offset = address % 4;
 			address = address / 4;
 			pc.p.ioFrame = address;
@@ -59,7 +62,7 @@ public class Execute {
 			pc.t.interrupt();
 			break;
 		case 1:
-			Dispatcher.threadMessage("WR" + " " + c[2] + " " + c[3] + " " + c[4]);
+			//Dispatcher.threadMessage("WR" + " " + c[2] + " " + c[3] + " " + c[4]);
 			pc.p.count++;
 			hex = Integer.toHexString(pc.p.registerBank[c[2]]);
 			//Dispatcher.threadMessage("hex = " + hex + " for register " + c[2]);
@@ -73,7 +76,11 @@ public class Execute {
 				address = EffectiveAddress.DirectAddress(0,pc.p.registerBank[c[3]]);
 			else
 				address = EffectiveAddress.DirectAddress(0, c[4]);
-			address -= pc.p.codeSize ;
+			//Dispatcher.threadMessage("Current address = " + address);
+			if ((pc.p.codeSize %4) != 0)
+			{
+				address++;
+			}
 			offset = address % 4;
 			address = address / 4;
 			pc.p.ioFrame = address;
@@ -85,7 +92,7 @@ public class Execute {
 			pc.t.interrupt();
 			break;
 		case 2:
-			Dispatcher.threadMessage("ST" + " " + c[2] + " " + c[3] + " " + c[4]);
+			//Dispatcher.threadMessage("ST" + " " + c[2] + " " + c[3] + " " + c[4]);
 			hex = Integer.toHexString(pc.p.registerBank[c[2]]);
 			hex = hex.toUpperCase();
 			hexArr = hex.toCharArray();
@@ -101,7 +108,7 @@ public class Execute {
 			pc.tempCache[address][offset] = inst.clone();
 			break;
 		case 3:
-			Dispatcher.threadMessage("LW" + " " + c[2] + " " + c[3] + " " + c[4]);
+			//Dispatcher.threadMessage("LW" + " " + c[2] + " " + c[3] + " " + c[4]);
 			address = EffectiveAddress.DirectAddress(0,pc.p.registerBank[c[2]]);
 			//Dispatcher.threadMessage("Loading from " + address);
 			address -= (pc.p.codeSize + 32);
@@ -120,69 +127,69 @@ public class Execute {
 			pc.p.registerBank[c[3]] = sum;
 			break;
 		case 4:
-			Dispatcher.threadMessage("MOV" + " " + c[2] + " " + c[3] + " " + c[4]);
+			//Dispatcher.threadMessage("MOV" + " " + c[2] + " " + c[3] + " " + c[4]);
 			pc.p.registerBank[c[2]]= pc.p.registerBank[c[3]];
 			break;
 		case 5:
-			Dispatcher.threadMessage("ADD" + " " + c[2] + " " + c[3] + " " + c[4]);
+			//Dispatcher.threadMessage("ADD" + " " + c[2] + " " + c[3] + " " + c[4]);
 			pc.p.registerBank[c[4]]=pc.p.registerBank[c[2]] + pc.p.registerBank[c[3]];
 			break;
 		case 6:
-			Dispatcher.threadMessage("SUB" + " " + c[2] + " " + c[3] + " " + c[4]);
+			//Dispatcher.threadMessage("SUB" + " " + c[2] + " " + c[3] + " " + c[4]);
 			pc.p.registerBank[c[4]]=pc.p.registerBank[c[2]] - pc.p.registerBank[c[3]];
 			break;
 		case 7:
-			Dispatcher.threadMessage("MUL" + " " + c[2] + " " + c[3] + " " + c[4]);
+			//Dispatcher.threadMessage("MUL" + " " + c[2] + " " + c[3] + " " + c[4]);
 			pc.p.registerBank[c[4]]=pc.p.registerBank[c[2]] * pc.p.registerBank[c[3]];
 			break;
 		case 8:
-			Dispatcher.threadMessage("DIV" + " " + c[2] + " " + c[3] + " " + c[4]);
+			//Dispatcher.threadMessage("DIV" + " " + c[2] + " " + c[3] + " " + c[4]);
 			pc.p.registerBank[c[4]]=pc.p.registerBank[c[2]] / pc.p.registerBank[c[3]];
 			break;
 		case 9:
-			Dispatcher.threadMessage("AND" + " " + c[2] + " " + c[3] + " " + c[4]);
+			//Dispatcher.threadMessage("AND" + " " + c[2] + " " + c[3] + " " + c[4]);
 			pc.p.registerBank[c[4]]=pc.p.registerBank[c[2]] & pc.p.registerBank[c[3]];
 			break;
 		case 10:
-			Dispatcher.threadMessage("OR" + " " + c[2] + " " + c[3] + " " + c[4]);
+			//Dispatcher.threadMessage("OR" + " " + c[2] + " " + c[3] + " " + c[4]);
 			pc.p.registerBank[c[4]]=pc.p.registerBank[c[2]] | pc.p.registerBank[c[3]];
 			break;
 		case 11:
-			Dispatcher.threadMessage("MOVI" + " " + c[2] + " " + c[3] + " " + c[4]);
+			//Dispatcher.threadMessage("MOVI" + " " + c[2] + " " + c[3] + " " + c[4]);
 			pc.p.registerBank[c[3]] = c[4];
 			break;
 		case 12:
-			Dispatcher.threadMessage("ADDI" + " " + c[2] + " " + c[3] + " " + c[4]);
+			//Dispatcher.threadMessage("ADDI" + " " + c[2] + " " + c[3] + " " + c[4]);
 			pc.p.registerBank[c[3]] += c[4];
 			break;
 		case 13:
-			Dispatcher.threadMessage("MULI" + " " + c[2] + " " + c[3] + " " + c[4]);
+			//Dispatcher.threadMessage("MULI" + " " + c[2] + " " + c[3] + " " + c[4]);
 			pc.p.registerBank[c[3]] *= c[4];
 			break;
 		case 14:
-			Dispatcher.threadMessage("DIVI" + " " + c[2] + " " + c[3] + " " + c[4]);
+			//Dispatcher.threadMessage("DIVI" + " " + c[2] + " " + c[3] + " " + c[4]);
 			pc.p.registerBank[c[3]] /= c[4];
 			break;
 		case 15:
-			Dispatcher.threadMessage("LDI" + " " + c[2] + " " + c[3] + " " + c[4]);
+			//Dispatcher.threadMessage("LDI" + " " + c[2] + " " + c[3] + " " + c[4]);
 			pc.p.registerBank[c[3]] = c[4];
 			break;
 		case 16:
-			Dispatcher.threadMessage("SLT" + " " + c[2] + " " + c[3] + " " + c[4]);
+			//Dispatcher.threadMessage("SLT" + " " + c[2] + " " + c[3] + " " + c[4]);
 			if (pc.p.registerBank[c[2]]<pc.p.registerBank[c[3]])
 				pc.p.registerBank[c[4]]=1;
 			else
 				pc.p.registerBank[c[4]]=0;
 			break;
 		case 17:
-			Dispatcher.threadMessage("SLTI" + " " + c[2] + " " + c[3] + " " + c[4]);
+			//Dispatcher.threadMessage("SLTI" + " " + c[2] + " " + c[3] + " " + c[4]);
 			if (pc.p.registerBank[c[2]]<c[4])
 				pc.p.registerBank[c[3]]=1;
 			else
 				pc.p.registerBank[c[3]]=0;
 			break;
 		case 18:
-			System.out.println("HLT" + " " + c[2] + " " + c[3] + " " + c[4]);
+			//Dispatcher.threadMessage("HLT" + " " + c[2] + " " + c[3] + " " + c[4]);
 			address = pc.p.codeSize;
 			pc.p.PC = address % 4;
 			pc.p.FC = address / 4; // Force PC to end of job
@@ -192,14 +199,14 @@ public class Execute {
 			pc.t.interrupt();
 			break;
 		case 20:
-			Dispatcher.threadMessage("JMP" + " " + c[2] + " " + c[3] + " " + c[4]);
+			//Dispatcher.threadMessage("JMP" + " " + c[2] + " " + c[3] + " " + c[4]);
 			address = EffectiveAddress.DirectAddress(0, c[2]);
 			pc.p.PC = address % 4;
 			pc.p.FC = address / 4;
 			jumped = true;
 			break;
 		case 21:
-			Dispatcher.threadMessage("BEQ" + " " + c[2] + " " + c[3] + " " + c[4]);
+			//Dispatcher.threadMessage("BEQ" + " " + c[2] + " " + c[3] + " " + c[4]);
 			if (pc.p.registerBank[c[2]] == pc.p.registerBank[c[3]])
 			{
 				address = EffectiveAddress.DirectAddress(0, c[4]);
@@ -209,7 +216,7 @@ public class Execute {
 			}
 			break;
 		case 22:
-			Dispatcher.threadMessage("BNE" + " " + c[2] + " " + c[3] + " " + c[4]);
+			//Dispatcher.threadMessage("BNE" + " " + c[2] + " " + c[3] + " " + c[4]);
 			if (pc.p.registerBank[c[2]] != pc.p.registerBank[c[3]])
 			{
 				address = EffectiveAddress.DirectAddress(0, c[4]);
@@ -219,7 +226,7 @@ public class Execute {
 			}
 			break;
 		case 23:
-			Dispatcher.threadMessage("BEZ" + " " + c[2] + " " + c[3] + " " + c[4]);
+			//Dispatcher.threadMessage("BEZ" + " " + c[2] + " " + c[3] + " " + c[4]);
 			if (pc.p.registerBank[c[3]] == 0)
 			{
 				address = EffectiveAddress.DirectAddress(0, c[4]);
@@ -229,7 +236,7 @@ public class Execute {
 			}
 			break;
 		case 24:
-			Dispatcher.threadMessage("BNZ" + " " + c[2] + " " + c[3] + " " + c[4]);
+			//Dispatcher.threadMessage("BNZ" + " " + c[2] + " " + c[3] + " " + c[4]);
 			if (pc.p.registerBank[c[2]] != 0)
 			{
 				address = EffectiveAddress.DirectAddress(0, c[4]);
@@ -239,7 +246,7 @@ public class Execute {
 			}
 			break;
 		case 25:
-			Dispatcher.threadMessage("BGZ" + " " + c[2] + " " + c[3] + " " + c[4]);
+			//Dispatcher.threadMessage("BGZ" + " " + c[2] + " " + c[3] + " " + c[4]);
 			if (pc.p.registerBank[c[2]] > 0)
 			{
 				address = EffectiveAddress.DirectAddress(0, c[4]);
@@ -249,7 +256,7 @@ public class Execute {
 			}
 			break;
 		case 26:
-			Dispatcher.threadMessage("BLZ" + " " + c[2] + " " + c[3] + " " + c[4]);
+			//Dispatcher.threadMessage("BLZ" + " " + c[2] + " " + c[3] + " " + c[4]);
 			if (pc.p.registerBank[c[2]] < 0)
 			{
 				address = EffectiveAddress.DirectAddress(0, c[4]);
