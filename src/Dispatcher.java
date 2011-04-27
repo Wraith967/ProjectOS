@@ -40,7 +40,7 @@ public class Dispatcher {
 	{
 		isDone = false;
 		CPUDone = false;
-		for (int i=0; i<4; i++)
+		for (int i=0; i<1; i++)
 		{
 			LoadData(c[i], rq.pop(), 6);
 		}
@@ -90,11 +90,11 @@ public class Dispatcher {
 					}
 					
 				}
-				i++;
-				i %= 4;
+//				i++;
+//				i %= 4;
 			}
 		}
-		for (i=0; i<4; i++)
+		for (i=0; i<1; i++)
 		{
 			while (!CPUDone)
 			{

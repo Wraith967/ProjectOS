@@ -13,7 +13,7 @@ public class BlockingQueue {
     queue (on most VMs).
    */
   private final ArrayList<PCB> arr;
-  
+
   public BlockingQueue()
   {
 	  arr = new ArrayList<PCB>();
@@ -76,6 +76,7 @@ public class BlockingQueue {
   public synchronized void sort() {
 	  synchronized(arr) {
 	  mergeSort();
+	  //print();
 	  arr.notify();
 	  }
   }

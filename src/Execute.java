@@ -35,6 +35,7 @@ public class Execute {
 		{
 		case 0:
 			pc.p.count++;
+			//Dispatcher.threadMessage("Current value of register " + c[3] + " = " + pc.registerBank[c[3]]);
 			if (c[4]==0)
 				address = EffectiveAddress.DirectAddress(0,pc.registerBank[c[3]]);
 			else

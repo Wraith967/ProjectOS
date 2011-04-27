@@ -23,7 +23,7 @@ public class OSDriver {
 		PCB[] PCBarr = new PCB[30];
 		BlockingQueue readyQueue = new BlockingQueue();
 		BlockingQueue readQueue = new BlockingQueue();
-		BlockingQueue writeQueue = new BlockingQueue();		
+		BlockingQueue writeQueue = new BlockingQueue();	
 		long avgRunTime=0, avgReadyTime=0;
 		long totalRunTime, runStart, runEnd;
 		String input, output;

@@ -79,6 +79,7 @@ public class PageHandler {
 	
 	public synchronized boolean LoadInputPage(PCB p)
 	{
+		//Dispatcher.threadMessage("Pages Remaining = " + pT.numPagesRemain + " for job " + p.jobID);
 		if (pT.numPagesRemain !=0)
 		{
 			for (int i=p.numPages; i<p.numPages+5; i++)
@@ -102,6 +103,7 @@ public class PageHandler {
 	
 	public synchronized boolean LoadOutputPage(PCB p)
 	{
+		//Dispatcher.threadMessage("Pages Remaining = " + pT.numPagesRemain + " for job " + p.jobID);
 		if (pT.numPagesRemain !=0)
 		{
 			for (int i=p.numPages+5; i<p.numPages+9; i++)
@@ -121,5 +123,5 @@ public class PageHandler {
 		}
 		else
 			return false;
-	}		
+	}
 }
