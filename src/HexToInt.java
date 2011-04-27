@@ -1,8 +1,4 @@
 /**
- * 
- */
-
-/**
  * @author Ben
  * Created: 3/3/2011
  * Last Edit: 3/3/2011
@@ -52,6 +48,5 @@ public class HexToInt {
 			return 15;
 		}
 		return -1;
-	}
-	
+	}	
 }

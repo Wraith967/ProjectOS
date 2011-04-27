@@ -1,8 +1,4 @@
 /**
- * 
- */
-
-/**
  * @author Ben
  * Created: 2/17/2011
  * Last Edit: 3/3/2011
@@ -17,6 +13,7 @@ public class EffectiveAddress {
 	 */
 	public static int DirectAddress(int offset, int base)
 	{
+		//Dispatcher.threadMessage("offset = " + offset + " base = " + base);
 		return (base+offset)/4;
 	}
 	/**
@@ -30,5 +27,4 @@ public class EffectiveAddress {
 	{
 			return (base+index+offset)/4;
 	}
-	
 }

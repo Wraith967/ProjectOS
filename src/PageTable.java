@@ -1,8 +1,4 @@
 /**
- * 
- */
-
-/**
  * @author Ben
  * Created: 4/8/2011
  * Last Edit: 4/8/2011
@@ -12,7 +8,6 @@ public class PageTable {
 	int [][] pTable;
 	int numPagesRemain;
 	int tblPtr;
-	
 	
 	public PageTable()
 	{
@@ -28,5 +23,4 @@ public class PageTable {
 			System.out.println("Page " + i + " is valid: " + pTable[i][0] + " has been modified: " + pTable[i][1]);
 		}
 	}
-	
 }

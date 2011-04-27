@@ -1,8 +1,4 @@
 /**
- * 
- */
-
-/**
  * @author Ben
  * Created: 2/17/2011
  * Last Edit: 3/3/2011
@@ -30,7 +26,6 @@ public class Decode {
 			msg += a[i];
 			converted[i] = HexToInt.convertHextoInt(a[i]);
 		}
-		//Dispatcher.threadMessage("Decoder called on " + msg);
 		switch (converted[0])
 		{
 			case 0:

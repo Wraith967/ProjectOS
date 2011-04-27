@@ -4,15 +4,10 @@ import java.io.IOException;
 import java.util.Scanner;
 
 /**
- * 
- */
-
-/**
  * @author Ben
  * Created: 2/9/2011
  * Last Edit: 3/13/2011
  */
-
 
 public class OSDriver {
 
@@ -26,17 +21,16 @@ public class OSDriver {
 		char[][][] disk = new char[512][4][8]; // holds all instructions as 8 chars
 		PageTable PTable = new PageTable();
 		PCB[] PCBarr = new PCB[30];
-		BlockingQueue readyQueue = new BlockingQueue(false, "ready");
-		BlockingQueue readQueue = new BlockingQueue(false, "read");
-		BlockingQueue writeQueue = new BlockingQueue(false, "write");
-		BlockingQueue blockQueue = new BlockingQueue(false, "block");
+		BlockingQueue readyQueue = new BlockingQueue();
+		BlockingQueue readQueue = new BlockingQueue();
+		BlockingQueue writeQueue = new BlockingQueue();		
 		long avgRunTime=0, avgReadyTime=0;
 		long totalRunTime, runStart, runEnd;
 		String input, output;
 		Scanner scan = new Scanner(System.in);
 		
 		for (int i=0; i<30; i++)
-		PCBarr[i] = new PCB(PTable);
+			PCBarr[i] = new PCB(PTable);
 		
 		//Modules
 		Loader control = new Loader(); // handles reading in and parsing of all instructions
@@ -47,7 +41,7 @@ public class OSDriver {
 		CPU[] comp = new CPU[4]; // handles processing
 		for (int i=0; i<4; i++)
 			comp[i] = new CPU(mgr, readQueue, writeQueue, PH);
-		Dispatcher disp = new Dispatcher(mgr, sched, comp, PCBarr, readyQueue, readQueue, writeQueue, blockQueue); // moves job data to CPU
+		Dispatcher disp = new Dispatcher(mgr, sched, comp, PCBarr, readyQueue, readQueue, writeQueue); // moves job data to CPU
 		
 		//Method Calls
 		System.out.println("Name of input file:");
@@ -76,7 +70,6 @@ public class OSDriver {
 			PCBarr[i].ComputeTime();
 			avgRunTime += PCBarr[i].runTime;
 			avgReadyTime += PCBarr[i].readyTime;
-			//System.out.println("Number of I/O for jobID: " + PCBarr[i].jobID + " = " + PCBarr[i].IOcount);
 		}
 		
 		avgRunTime /= 30;
@@ -85,9 +78,6 @@ public class OSDriver {
 		System.out.println("Average time on CPU = " + avgRunTime + "ns");
 		System.out.println("Average time in ready queue = " + avgReadyTime + "ns");
 		System.out.println("Total system time = " + totalRunTime + "ns");
-		
-		
-		// PC Cache size needed: 72 words		
 	}
 	
 	private static void CoreDump(PCB[] p, char[][][] disk, String output, int end) throws IOException
