@@ -103,7 +103,8 @@ public class Loader {
 				}
 				else
 				{
-					//System.out.println(pArr[y]);
+					//pArr[y].ComputeSize();
+					//System.out.println(pArr[y++]);
 					pArr[y++].ComputeSize();
 					//System.out.println(pArr[y++].totalSize);
 					if (z>0)

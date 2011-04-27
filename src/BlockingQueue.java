@@ -17,42 +17,65 @@ public class BlockingQueue {
     although an ArrayList is usually more efficient for a short
     queue (on most VMs).
    */
-  private final ArrayList<PCB> arr = new ArrayList<PCB>();
+  private final ArrayList<PCB> arr;
+  private boolean announce;
+  private String name;
+  
+  public BlockingQueue(boolean a, String n)
+  {
+	  arr = new ArrayList<PCB>();
+	  announce = a;
+	  name = n;
+  }
   /**
     This method pushes an object onto the end of the queue, and
     then notifies one of the waiting threads.
    */
-  public void push(PCB p) {
+  public synchronized void push(PCB p) {
     synchronized(arr) {
     	//Dispatcher.threadMessage(this.toString() + " push called on job " + p.jobID);
       arr.add(p);
+      if (announce)
+      Dispatcher.threadMessage(name + " pushing job " + p.jobID);
      // Dispatcher.threadMessage("Queue has " + last + " items");
       arr.notify();
     }
   }
+  public synchronized void pushFront(PCB p)
+  {
+	  synchronized(arr){
+		  arr.add(0, p);
+		  arr.notify();
+	  }
+  }
+  
   /**
     The pop operation blocks until either an object is returned
     or the thread is interrupted, in which case it throws an
     InterruptedException.
    */
-  public PCB pop() throws InterruptedException {
+  public synchronized PCB pop() throws InterruptedException {
     synchronized(arr) {
     	PCB temp = arr.remove(0);
     	//Dispatcher.threadMessage(this.toString() + " pop called on job " + temp.jobID);
+    	if (announce)
+    	      Dispatcher.threadMessage(name + " popping job " + temp.jobID);
     	arr.notify();
     	return temp;
     }
   }
   /** Return the number of elements currently in the queue. */
-  public int size() {
+  public synchronized int size() {
     return arr.size();
   }
   
-  public boolean isEmpty() {
+  public synchronized boolean isEmpty() {
+//	  if (announce)
+//		  Dispatcher.threadMessage(name + " is empty: " + arr.isEmpty());
 	  return arr.isEmpty();
   }
   
-  public void print()
+  public synchronized void print()
   {
 	  synchronized(arr)
 	  {
@@ -68,9 +91,10 @@ public class BlockingQueue {
   /**
    * Calls the sorting method on the inner array
    */
-  public void sort() {
+  public synchronized void sort() {
 	  synchronized(arr) {
 	  mergeSort();
+	  //print();
 	  arr.notify();
 	  }
   }

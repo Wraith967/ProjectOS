@@ -34,6 +34,8 @@ public class PCB {
 	char[] writeInst; // output number 
 	boolean finished = false;
 	boolean running = false;
+	boolean reading = false;
+	boolean writing = false;
 	
 	long runTime; // Length of time job was on CPU
 	long readyTime; // Length of time on ready queue

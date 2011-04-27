@@ -11,6 +11,7 @@ public class CPU implements Runnable{
 	
 	char[][][] cache; // Interior CPU cache
 	char[][][] tempCache;
+	int[] registerBank;
 	static int cpuNum; // Total number of CPUs created
 	int cpuID; // Unique ID for each CPU
 	Decode dec; // decodes instructions
@@ -18,7 +19,6 @@ public class CPU implements Runnable{
 	char[] inst; // array for each instruction
 	MemoryManager mgr; // for access to memory
 	int[] decodeInst; // array for decoded instruction
-	//int alpha, omega; // begin/end indices for memory usage
 	PCB p;
 	Thread t;
 	PageHandler PH;
@@ -27,6 +27,7 @@ public class CPU implements Runnable{
 	{
 		cache = new char[7][4][8]; // 72 is maximum total length 
 		tempCache = new char[3][4][8];
+		registerBank = new int[16];
 		dec = new Decode();
 		exe = new Execute(this, mgr, read, write);
 		inst = new char[8];
@@ -49,7 +50,13 @@ public class CPU implements Runnable{
 		p.running = true;
 		while (true)
 		{
-			if ((p.FC < 0) || (p.FC >= p.numPages))
+			if (p.finished)
+			{
+				p.running = false;
+				//Dispatcher.threadMessage("Job " + p.jobID + " finished");
+				break;
+			}
+			else if ((p.FC < 0) || (p.FC >= p.numPages))
 			{
 				Dispatcher.threadMessage("Error with job " + p.jobID + " FC out of bounds");
 				p.finished = true;
@@ -59,12 +66,18 @@ public class CPU implements Runnable{
 			}
 			//Dispatcher.threadMessage("Interrupt status: " + t.isInterrupted());
 			else if (t.isInterrupted())
+			{
+				//Dispatcher.threadMessage("Thread interrupted");
 				break;
+			}
 			else if (p.pages[p.FC] != -1)
 			{
 				//Dispatcher.threadMessage("Reading instruction from: " + p.FC + " at " + p.PC);
 				inst = cache[p.FC][p.PC];
-				//Dispatcher.threadMessage("Current instruction " + inst.toString());
+//				String msg = "";
+//				for (int i=0; i<8; i++)
+//					msg += inst[i];
+//				Dispatcher.threadMessage("Current instruction " + msg);
 				decodeInst = dec.DecodeInst(inst);
 				//Dispatcher.threadMessage("Decoder called");
 				exe.ExecInst(decodeInst);

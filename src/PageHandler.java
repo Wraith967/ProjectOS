@@ -21,7 +21,7 @@ public class PageHandler {
 		ptr = -1;
 	}
 	
-	public void UnLoadFrames(PCB p)
+	public synchronized void UnLoadFrames(PCB p)
 	{
 		//Dispatcher.threadMessage("Unloading job");
 		for (int i=0; i<p.numPages+8; i++)
@@ -35,14 +35,14 @@ public class PageHandler {
 		}
 	}
 
-	private void UpdatePtr()
+	private synchronized void UpdatePtr()
 	{
 		synchronized(pT){
 			//Dispatcher.threadMessage("Updating ptr at " + pT.tblPtr);
 			boolean found = false;
 			for (int i=pT.tblPtr; i<256; i++)
 			{
-				//Dispatcher.threadMessage("Checking for ptr at " + i + " with valid bit of " + pT.pTable[pT.tblPtr][0]);
+				//Dispatcher.threadMessage("Checking for ptr at " + i + " with valid bit of " + pT.pTable[i][0]);
 				if (pT.pTable[i][0] == 0)
 				{
 					//Dispatcher.threadMessage("Ptr found at " + i);
@@ -67,7 +67,7 @@ public class PageHandler {
 		}
 	}
 	
-	public boolean LoadInstPage(PCB p)
+	public synchronized boolean LoadInstPage(PCB p)
 	{
 		//Dispatcher.threadMessage("Pages Remaining = " + pT.numPagesRemain + " for job " + p.jobID);
 		synchronized(pT){
@@ -113,8 +113,9 @@ public class PageHandler {
 		}
 	}
 	
-	public boolean LoadInputPage(PCB p)
+	public synchronized boolean LoadInputPage(PCB p)
 	{
+		//Dispatcher.threadMessage("Pages Remaining = " + pT.numPagesRemain + " for job " + p.jobID);
 		if (pT.numPagesRemain !=0)
 		{
 			for (int i=0; i<5; i++)
@@ -137,13 +138,14 @@ public class PageHandler {
 			return false;
 	}
 	
-	public boolean LoadOutputPage(PCB p)
+	public synchronized boolean LoadOutputPage(PCB p)
 	{
+		//Dispatcher.threadMessage("Pages Remaining = " + pT.numPagesRemain + " for job " + p.jobID);
 		if (pT.numPagesRemain !=0)
 		{
-			for (int i=0; i<4; i++)
+			for (int i=p.numPages+5; i<p.numPages+9; i++)
 			{
-				if (p.pages[p.numPages+5+i] == -1)
+				if (p.pages[i] == -1)
 				{
 					//Dispatcher.threadMessage("Output ptr found at " + i);
 					ptr = i;
@@ -151,7 +153,7 @@ public class PageHandler {
 				}
 			}
 			//Dispatcher.threadMessage("Loading Output for job " + p.jobID + " at ptr " + ptr);
-			mgr.WriteFrame(pT.tblPtr, disk[p.beginIndex+ptr+p.numPages+5]);
+			mgr.WriteFrame(pT.tblPtr, disk[p.beginIndex+ptr]);
 			pT.pTable[pT.tblPtr][0] = 1;
 			p.pages[ptr] = pT.tblPtr;
 			UpdatePtr();

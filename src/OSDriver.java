@@ -26,23 +26,23 @@ public class OSDriver {
 		char[][][] disk = new char[512][4][8]; // holds all instructions as 8 chars
 		PageTable PTable = new PageTable();
 		PCB[] PCBarr = new PCB[30];
-		BlockingQueue readyQueue = new BlockingQueue();
-		BlockingQueue readQueue = new BlockingQueue();
-		BlockingQueue writeQueue = new BlockingQueue();
-		BlockingQueue blockQueue = new BlockingQueue();
+		BlockingQueue readyQueue = new BlockingQueue(false, "ready");
+		BlockingQueue readQueue = new BlockingQueue(false, "read");
+		BlockingQueue writeQueue = new BlockingQueue(false, "write");
+		BlockingQueue blockQueue = new BlockingQueue(true, "block");
 		long avgRunTime=0, avgReadyTime=0;
 		long totalRunTime, runStart, runEnd;
 		String input, output;
 		Scanner scan = new Scanner(System.in);
 		
 		for (int i=0; i<30; i++)
-		PCBarr[i] = new PCB(PTable);
+			PCBarr[i] = new PCB(PTable);
 		
 		//Modules
 		Loader control = new Loader(); // handles reading in and parsing of all instructions
 		MemoryManager mgr = new MemoryManager(); // handles RAM
 		PageHandler PH = new PageHandler(PTable, mgr, disk);
-		DMAChannel dm = new DMAChannel(readQueue, writeQueue, readyQueue, mgr, PH); // handles I/O requests
+		DMAChannel dm = new DMAChannel(readQueue, writeQueue, readyQueue, blockQueue, mgr, PH); // handles I/O requests
 		Scheduler sched = new Scheduler(mgr, disk, PCBarr, readyQueue); // moves job to CPU
 		CPU[] comp = new CPU[4]; // handles processing
 		for (int i=0; i<4; i++)

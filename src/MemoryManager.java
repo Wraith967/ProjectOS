@@ -16,7 +16,7 @@ public class MemoryManager {
 		memory = new char[256][4][8];
 	}
 	
-	public void WriteFrame(int address, char[][] frame)
+	public synchronized void WriteFrame(int address, char[][] frame)
 	{
 		synchronized(memory){
 			memory[address] = frame;
@@ -24,7 +24,7 @@ public class MemoryManager {
 		}
 	}
 	
-	public char[][] ReadFrame(int address)
+	public synchronized char[][] ReadFrame(int address)
 	{
 		char [][] temp;
 		synchronized(memory){
@@ -33,15 +33,5 @@ public class MemoryManager {
 		}
 		return temp;
 	}
-	
-//	public void WriteInstruction(int address, char[] instruction)
-//	{
-//		memory[address]=instruction;
-//	}
-//	
-//	public char[] ReadInstruction(int address)
-//	{
-//		return memory[address];
-//	}
 	
 }

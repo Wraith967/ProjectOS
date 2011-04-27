@@ -11,18 +11,19 @@ public class DMAChannel implements Runnable{
 
 	Thread t;
 	int address, offset;
-	BlockingQueue read, write, rdy;
+	BlockingQueue read, write, rdy, block;
 	int power, sum;
 	char[] inst;
 	MemoryManager mgr;
 	PageHandler PH;
 	
-	public DMAChannel(BlockingQueue r, BlockingQueue w, BlockingQueue rdy, MemoryManager m, PageHandler p)
+	public DMAChannel(BlockingQueue r, BlockingQueue w, BlockingQueue rdy, BlockingQueue b, MemoryManager m, PageHandler p)
 	{
 		address = 0;
 		read = r;
 		write = w;
 		this.rdy = rdy;
+		block = b;
 		mgr = m;
 		PH = p;
 	}
@@ -31,11 +32,11 @@ public class DMAChannel implements Runnable{
 	{
 		PCB temp = read.pop();
 		//Dispatcher.threadMessage("Read called for PCB: " + temp.jobID + " at FC: " + temp.FC + " at PC: " + temp.PC);
+		//Dispatcher.threadMessage("Reading with ioFrame = " + temp.ioFrame + " and ioOffset = " + temp.ioOffset);		
 		sum = 0;
-		Dispatcher.threadMessage("Reading with ioFrame = " + temp.ioFrame + " and ioOffset = " + temp.ioOffset);
 		if (temp.pages[temp.ioFrame] != -1)
 		{
-			inst = mgr.ReadFrame(temp.pages[temp.ioFrame])[temp.ioOffset];
+			inst = mgr.ReadFrame(temp.pages[temp.ioFrame])[temp.ioOffset].clone();
 			for (int i=0; i<8; i++)
 			{
 				power = 1;
@@ -45,16 +46,32 @@ public class DMAChannel implements Runnable{
 				}
 				sum += (HexToInt.convertHextoInt(inst[i]))*power;
 			}
+			//System.out.println("sum = " + sum + " for register " + temp.readInst[2]);
 			//Dispatcher.threadMessage("sum = " + sum + " for register " + temp.readInst[2]);
 			temp.registerBank[temp.readInst[2]] = sum;
 			//Dispatcher.threadMessage("Current size of ready queue " + rdy.size());
-			rdy.push(temp);
-			rdy.sort();
+			synchronized(rdy)
+			{
+				rdy.push(temp);
+				rdy.sort();
+				rdy.notify();
+			}
 		}
 		else
 		{
-			PH.LoadInputPage(temp);
+			
+			if(PH.LoadInputPage(temp))
+			{
+				//Dispatcher.threadMessage("Loaded new input page");
+				read.pushFront(temp);
+				Read();
+			}
+			else
+				block.push(temp);
 		}
+		
+		temp.reading = false;
+		
 	}
 	
 	public void Write() throws InterruptedException
@@ -65,7 +82,7 @@ public class DMAChannel implements Runnable{
 		{
 			//Dispatcher.threadMessage("Write called for PCB: " + temp.jobID + " at FC: " + temp.FC + " at PC: " + temp.PC);
 			
-			char [][] tempF = mgr.ReadFrame(temp.pages[temp.ioFrame]);
+			char [][] tempF = mgr.ReadFrame(temp.pages[temp.ioFrame]).clone();
 //			for (int i=0; i<4; i++)
 //			{
 //				for (int j=0; j<8; j++)
@@ -74,7 +91,7 @@ public class DMAChannel implements Runnable{
 //				}
 //				System.out.println();
 //			}
-			tempF[temp.ioOffset] = temp.writeInst;
+			tempF[temp.ioOffset] = temp.writeInst.clone();
 //			for (int i=0; i<4; i++)
 //			{
 //				for (int j=0; j<8; j++)
@@ -83,16 +100,29 @@ public class DMAChannel implements Runnable{
 //				}
 //				System.out.println();
 //			}
-			mgr.WriteFrame(temp.pages[temp.ioFrame], tempF);
+			mgr.WriteFrame(temp.pages[temp.ioFrame], tempF.clone());
 			temp.p.pTable[temp.pages[temp.ioFrame]][1] = 1;
 			//Dispatcher.threadMessage("Current size of ready queue " + rdy.size());
+			synchronized(rdy)
+			{
 			rdy.push(temp);
-			rdy.sort();
+			//rdy.sort();
+			rdy.notify();
+			}
 		}
 		else
 		{
-			PH.LoadOutputPage(temp);
-		}			
+			if(PH.LoadOutputPage(temp))
+			{
+				//Dispatcher.threadMessage("Loaded new output page");
+				write.pushFront(temp);
+				Write();
+			}
+			else
+				block.push(temp);
+		}
+		temp.writing = false;
+		
 	}
 
 	public void go()

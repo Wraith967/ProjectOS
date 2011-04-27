@@ -45,7 +45,7 @@ public class Dispatcher {
 	{
 		isDone = false;
 		CPUDone = false;
-		for (int i=0; i<4; i++)
+		for (int i=0; i<1; i++)
 		{
 			LoadData(c[i], rq.pop(), 6);
 			c[i].go();
@@ -60,6 +60,8 @@ public class Dispatcher {
 				//threadMessage("Ready Queue not empty");
 				if (!c[i].t.isAlive())
 				{
+					//threadMessage("Running? " + c[i].p.running);
+					//threadMessage("Finished? " + c[i].p.finished);
 					if (c[i].p.running)
 					{
 						//threadMessage("Attempting to load new pages");
@@ -80,40 +82,58 @@ public class Dispatcher {
 							c[i].go();
 						}
 					}
-					else if (c[i].p.finished)
-					{
-						//threadMessage("Job finished");
-						//c[i].p.runEnd = System.nanoTime();
-						MemoryDump.MemDump(sch.disk, mgr, c[i].p, PH);
-						if (!block.isEmpty())
-						{
-							//threadMessage("Offloading from blocked queue");
-							rq.push(block.pop());
-						}
-						//rq.print();
-						//threadMessage("Current size of ready queue " + rq.size());
-						PCB temp = rq.pop();
-						//threadMessage("Loading job " + temp.jobID);
-						LoadData(c[i], temp, temp.numPages);
-						c[i].go();
-					}
 					else
 					{
-						//c[i].p.runEnd = System.nanoTime();
-						//rq.push(c[i].p);
-						//rq.print();
-						//threadMessage("Current size of ready queue " + rq.size());
-						PCB temp = rq.pop();
-						LoadData(c[i], temp, temp.numPages);
-						c[i].go();
+						if (c[i].p.reading)
+						{
+							c[i].p.registerBank = c[i].registerBank.clone();
+							read.push(c[i].p);
+							PCB temp = rq.pop();
+							//threadMessage("Loading job " + temp.jobID);
+							LoadData(c[i], temp, temp.numPages);
+							c[i].go();
+						}
+						else if (c[i].p.writing)
+						{
+							c[i].p.registerBank = c[i].registerBank.clone();
+							write.push(c[i].p);
+							PCB temp = rq.pop();
+							//threadMessage("Loading job " + temp.jobID);
+							LoadData(c[i], temp, temp.numPages);
+							c[i].go();
+						}
+						else if (c[i].p.finished)
+						{
+							//threadMessage("Job " + c[i].p.jobID + " finished");
+							//c[i].p.runEnd = System.nanoTime();
+							MemoryDump.MemDump(sch.disk, mgr, c[i].p, PH);
+							if(!block.isEmpty())
+								rq.push(block.pop());
+							//rq.print();
+							//threadMessage("Current size of ready queue " + rq.size());
+							PCB temp = rq.pop();
+							//threadMessage("Loading job " + temp.jobID);
+							LoadData(c[i], temp, temp.numPages);
+							c[i].go();
+						}
+						else
+						{
+							//c[i].p.runEnd = System.nanoTime();
+							//rq.push(c[i].p);
+							//rq.print();
+							//threadMessage("Current size of ready queue " + rq.size());
+							PCB temp = rq.pop();
+							LoadData(c[i], temp, temp.numPages);
+							c[i].go();
+						}
 					}
 					
 				}
-				i++;
-				i %= 4;
+//				i++;
+//				i %= 4;
 			}
 		}
-		for (i=0; i<4; i++)
+		for (i=0; i<1; i++)
 		{
 			while (!CPUDone)
 			{
@@ -137,8 +157,10 @@ public class Dispatcher {
 	private void LoadData(CPU comp, PCB p, int num) throws InterruptedException
 	{
 		p.readyEnd = System.nanoTime();
-		//threadMessage("Loading job " + p.jobID);
+		//threadMessage("Loading job " + p.jobID + " on CPU " + comp.cpuID);
+		comp.p = null;
 		comp.p = p;
+		comp.registerBank = p.registerBank.clone();
 		p.running = true;
 //		comp.alpha = p.base_Register;
 //		comp.omega = comp.alpha + p.totalSize;

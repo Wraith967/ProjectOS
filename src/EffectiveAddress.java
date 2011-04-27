@@ -17,6 +17,7 @@ public class EffectiveAddress {
 	 */
 	public static int DirectAddress(int offset, int base)
 	{
+		//Dispatcher.threadMessage("offset = " + offset + " base = " + base);
 		return (base+offset)/4;
 	}
 	/**
