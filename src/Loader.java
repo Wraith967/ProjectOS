@@ -5,6 +5,10 @@ import java.io.IOException;
 import java.util.regex.*;
 
 /**
+ * 
+ */
+
+/**
  * @author Ben
  * Created: 2/10/2011
  * Last Edit: 3/13/2011
@@ -38,6 +42,8 @@ public class Loader {
 	*/
 	public int runLoad(char[][][] arr, String text, PCB[] pArr) throws IOException
 	{
+		//System.out.println(pattern1.toString());
+		//System.out.println(pattern2.toString());
 		try{
 		inputStream = new BufferedReader(new FileReader(text));
 		} catch (FileNotFoundException e)
@@ -52,6 +58,7 @@ public class Loader {
 			{
 				for (int i=0; i<8; i++)
 					arr[x][z][i] = line.charAt(i+2); // ignores "0x"
+				//System.out.print(arr[x++]);
 				z++;
 				if (z==4)
 				{
@@ -66,6 +73,7 @@ public class Loader {
 				tokens = line.split(" "); // Modify for regex, maybe
 				if (matcher1.find())
 				{
+					//System.out.println("Match pattern 1");
 					for (int i=0; i<3; i++)
 					{
 						jobData[i] = Integer.parseInt(tokens[i+2],16);
@@ -77,6 +85,7 @@ public class Loader {
 				}
 				else if (matcher2.find())
 				{
+					//System.out.println("Match pattern 2");
 					for (int i=0; i<3; i++)
 					{
 							jobData[i] = Integer.parseInt(tokens[i+2],16);
@@ -94,7 +103,10 @@ public class Loader {
 				}
 				else
 				{
+					//pArr[y].ComputeSize();
+					//System.out.println(pArr[y++]);
 					pArr[y++].ComputeSize();
+					//System.out.println(pArr[y++].totalSize);
 					if (z>0)
 					{
 						z=0;

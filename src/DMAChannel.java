@@ -1,4 +1,8 @@
 /**
+ * 
+ */
+
+/**
  * @author Ben
  * Created: 3/8/2011
  * Last Edit: 3/8/2011
@@ -26,7 +30,9 @@ public class DMAChannel implements Runnable{
 	
 	public void Read() throws InterruptedException
 	{
-		PCB temp = read.pop();	
+		PCB temp = read.pop();
+		//Dispatcher.threadMessage("Read called for PCB: " + temp.jobID + " at FC: " + temp.FC + " at PC: " + temp.PC);
+		//Dispatcher.threadMessage("Reading with ioFrame = " + temp.ioFrame + " and ioOffset = " + temp.ioOffset);		
 		sum = 0;
 		if (temp.pages[temp.ioFrame] != -1)
 		{
@@ -40,10 +46,12 @@ public class DMAChannel implements Runnable{
 				}
 				sum += (HexToInt.convertHextoInt(inst[i]))*power;
 			}
+			//System.out.println("sum = " + sum + " for register " + temp.readInst[2]);
+			//Dispatcher.threadMessage("sum = " + sum + " for register " + temp.readInst[2]);
 			temp.registerBank[temp.readInst[2]] = sum;
+			//Dispatcher.threadMessage("Current size of ready queue " + rdy.size());
 			synchronized(rdy)
 			{
-				temp.readyStart = System.nanoTime();
 				rdy.push(temp);
 				rdy.sort();
 				rdy.notify();
@@ -51,37 +59,70 @@ public class DMAChannel implements Runnable{
 		}
 		else
 		{
-			PH.LoadInputPage(temp);
-			read.pushFront(temp);
-			Read();
-		}		
+			
+			if(PH.LoadInputPage(temp))
+			{
+				//Dispatcher.threadMessage("Loaded new input page");
+				read.pushFront(temp);
+				Read();
+			}
+			else
+				block.push(temp);
+		}
+		
 		temp.reading = false;
+		
 	}
 	
 	public void Write() throws InterruptedException
 	{
 		PCB temp = write.pop();
+		//Dispatcher.threadMessage("Writing with ioFrame = " + temp.ioFrame + " and ioOffset = " + temp.ioOffset);
 		if (temp.pages[temp.ioFrame] != -1)
 		{
+			//Dispatcher.threadMessage("Write called for PCB: " + temp.jobID + " at FC: " + temp.FC + " at PC: " + temp.PC);
+			
 			char [][] tempF = mgr.ReadFrame(temp.pages[temp.ioFrame]).clone();
+//			for (int i=0; i<4; i++)
+//			{
+//				for (int j=0; j<8; j++)
+//				{
+//					System.out.print(tempF[i][j]);
+//				}
+//				System.out.println();
+//			}
 			tempF[temp.ioOffset] = temp.writeInst.clone();
+//			for (int i=0; i<4; i++)
+//			{
+//				for (int j=0; j<8; j++)
+//				{
+//					System.out.print(tempF[i][j]);
+//				}
+//				System.out.println();
+//			}
 			mgr.WriteFrame(temp.pages[temp.ioFrame], tempF.clone());
 			temp.p.pTable[temp.pages[temp.ioFrame]][1] = 1;
+			//Dispatcher.threadMessage("Current size of ready queue " + rdy.size());
 			synchronized(rdy)
 			{
-				temp.readyStart = System.nanoTime();
-				rdy.push(temp);
-				rdy.sort();
-				rdy.notify();
+			rdy.push(temp);
+			//rdy.sort();
+			rdy.notify();
 			}
 		}
 		else
 		{
-			PH.LoadOutputPage(temp);
-			write.pushFront(temp);
-			Write();
+			if(PH.LoadOutputPage(temp))
+			{
+				//Dispatcher.threadMessage("Loaded new output page");
+				write.pushFront(temp);
+				Write();
+			}
+			else
+				block.push(temp);
 		}
 		temp.writing = false;
+		
 	}
 
 	public void go()
@@ -97,24 +138,29 @@ public class DMAChannel implements Runnable{
 	
 	@Override
 	public void run() {
+		Dispatcher.threadMessage("DMAChannel starting up");
 		while (true)
 		{
 			if (t.isInterrupted())
 			{
+				Dispatcher.threadMessage("DMAChannel shutting down");
 				break;
 			}
 			if (!read.isEmpty())
 				try {
 					Read();
 				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			if (!write.isEmpty())
 				try {
 					Write();
 				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 		}
-	}	
+	}
+	
 }

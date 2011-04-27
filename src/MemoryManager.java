@@ -1,4 +1,8 @@
 /**
+ * 
+ */
+
+/**
  * @author Ben
  * Created: 2/17/2011
  * Last Edit: 2/17/2011
@@ -15,7 +19,7 @@ public class MemoryManager {
 	public synchronized void WriteFrame(int address, char[][] frame)
 	{
 		synchronized(memory){
-			memory[address] = frame.clone();
+			memory[address] = frame;
 			memory.notify();
 		}
 	}
@@ -24,9 +28,10 @@ public class MemoryManager {
 	{
 		char [][] temp;
 		synchronized(memory){
-			temp = memory[address].clone();
+			temp = memory[address];
 			memory.notify();
 		}
 		return temp;
 	}
+	
 }

@@ -1,4 +1,8 @@
 /**
+ * 
+ */
+
+/**
  * @author Ben
  * Created: 2/15/2011
  * Last Edit: 2/23/2011
@@ -21,7 +25,6 @@ public class PCB {
 	int totalSize; // Total job space required
 	int count; // Number of I/O requests made
 	int[] registerBank = new int[16];
-	char[][][] tempCache = new char[3][4][8];
 	PageTable p;
 	int[] pages; // holds addresses of frames in page table
 	int numPages; // number of frames for instruction space
@@ -34,12 +37,14 @@ public class PCB {
 	boolean reading = false;
 	boolean writing = false;
 	
-	long runTime = 0; // Length of time job was on CPU
-	long readyTime = 0; // Length of time on ready queue
+	long runTime; // Length of time job was on CPU
+	long readyTime; // Length of time on ready queue
 	long runStart;
 	long runEnd;
 	long readyStart;
 	long readyEnd;
+	
+	// TODO Add remaining PCB attributes
 	
 	public PCB(PageTable pTable)
 	{
@@ -55,7 +60,6 @@ public class PCB {
 		ret += " Output Buffer Size: " + outputBuffer;
 		ret += " Heap Size: " + tempBuffer;
 		ret += " Start Index: " + beginIndex;
-		ret += " Num Pages: " + numPages;
 		
 		return ret;
 		
@@ -76,7 +80,7 @@ public class PCB {
 	
 	public void ComputeTime()
 	{
-		runTime += runEnd - runStart;
-		readyTime += readyEnd - readyStart;
+		runTime = runEnd - runStart;
+		readyTime = readyEnd - readyStart;
 	}
 }
