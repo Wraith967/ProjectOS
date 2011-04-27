@@ -1,15 +1,10 @@
 import java.util.ArrayList;
 
 /**
- * 
- */
-
-/**
  * @author Wraith967
  * Created: 4/21/2011
  * Last Edit: 4/21/2011
  */
-
 
 public class BlockingQueue {
   /**
@@ -18,14 +13,10 @@ public class BlockingQueue {
     queue (on most VMs).
    */
   private final ArrayList<PCB> arr;
-  private boolean announce;
-  private String name;
-  
-  public BlockingQueue(boolean a, String n)
+
+  public BlockingQueue()
   {
 	  arr = new ArrayList<PCB>();
-	  announce = a;
-	  name = n;
   }
   /**
     This method pushes an object onto the end of the queue, and
@@ -33,11 +24,7 @@ public class BlockingQueue {
    */
   public synchronized void push(PCB p) {
     synchronized(arr) {
-    	//Dispatcher.threadMessage(this.toString() + " push called on job " + p.jobID);
       arr.add(p);
-      if (announce)
-      Dispatcher.threadMessage(name + " pushing job " + p.jobID);
-     // Dispatcher.threadMessage("Queue has " + last + " items");
       arr.notify();
     }
   }
@@ -57,9 +44,6 @@ public class BlockingQueue {
   public synchronized PCB pop() throws InterruptedException {
     synchronized(arr) {
     	PCB temp = arr.remove(0);
-    	//Dispatcher.threadMessage(this.toString() + " pop called on job " + temp.jobID);
-    	if (announce)
-    	      Dispatcher.threadMessage(name + " popping job " + temp.jobID);
     	arr.notify();
     	return temp;
     }
@@ -70,8 +54,6 @@ public class BlockingQueue {
   }
   
   public synchronized boolean isEmpty() {
-//	  if (announce)
-//		  Dispatcher.threadMessage(name + " is empty: " + arr.isEmpty());
 	  return arr.isEmpty();
   }
   
@@ -138,8 +120,8 @@ public class BlockingQueue {
       
       // Main loop
       while( leftPos <= leftEnd && rightPos <= rightEnd )
-          if( arr.get(leftPos).codeSize < arr.get(rightPos).codeSize  )
-      	//if( arr[leftPos].priority > arr[rightPos].priority  )
+        //if( arr.get(leftPos).codeSize < arr.get(rightPos).codeSize  )
+      	if( arr.get(leftPos).priority > arr.get(rightPos).priority  )
               tmpArray.add(tmpPos++,arr.get(leftPos++));
           else
               tmpArray.add(tmpPos++,arr.get(rightPos++));
