@@ -18,7 +18,6 @@ public class CPU implements Runnable{
 	char[] inst; // array for each instruction
 	MemoryManager mgr; // for access to memory
 	int[] decodeInst; // array for decoded instruction
-	//int alpha, omega; // begin/end indices for memory usage
 	PCB p;
 	Thread t;
 	PageHandler PH;
@@ -49,7 +48,13 @@ public class CPU implements Runnable{
 		p.running = true;
 		while (true)
 		{
-			if ((p.FC < 0) || (p.FC >= p.numPages))
+			if (p.finished)
+			{
+				p.running = false;
+				Dispatcher.threadMessage("Job " + p.jobID + " finished");
+				break;
+			}
+			else if ((p.FC < 0) || (p.FC >= p.numPages))
 			{
 				Dispatcher.threadMessage("Error with job " + p.jobID + " FC out of bounds");
 				p.finished = true;
@@ -59,12 +64,18 @@ public class CPU implements Runnable{
 			}
 			//Dispatcher.threadMessage("Interrupt status: " + t.isInterrupted());
 			else if (t.isInterrupted())
+			{
+				//Dispatcher.threadMessage("Thread interrupted");
 				break;
+			}
 			else if (p.pages[p.FC] != -1)
 			{
 				//Dispatcher.threadMessage("Reading instruction from: " + p.FC + " at " + p.PC);
 				inst = cache[p.FC][p.PC];
-				//Dispatcher.threadMessage("Current instruction " + inst.toString());
+//				String msg = "";
+//				for (int i=0; i<8; i++)
+//					msg += inst[i];
+//				Dispatcher.threadMessage("Current instruction " + msg);
 				decodeInst = dec.DecodeInst(inst);
 				//Dispatcher.threadMessage("Decoder called");
 				exe.ExecInst(decodeInst);

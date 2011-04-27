@@ -60,6 +60,8 @@ public class Dispatcher {
 				//threadMessage("Ready Queue not empty");
 				if (!c[i].t.isAlive())
 				{
+					//threadMessage("Running? " + c[i].p.running);
+					//threadMessage("Finished? " + c[i].p.finished);
 					if (c[i].p.running)
 					{
 						//threadMessage("Attempting to load new pages");
@@ -82,12 +84,12 @@ public class Dispatcher {
 					}
 					else if (c[i].p.finished)
 					{
-						//threadMessage("Job finished");
+						threadMessage("Job finished");
 						//c[i].p.runEnd = System.nanoTime();
 						MemoryDump.MemDump(sch.disk, mgr, c[i].p, PH);
 						if (!block.isEmpty())
 						{
-							//threadMessage("Offloading from blocked queue");
+							threadMessage("Offloading from blocked queue");
 							rq.push(block.pop());
 						}
 						//rq.print();

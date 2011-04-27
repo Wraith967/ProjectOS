@@ -26,10 +26,10 @@ public class OSDriver {
 		char[][][] disk = new char[512][4][8]; // holds all instructions as 8 chars
 		PageTable PTable = new PageTable();
 		PCB[] PCBarr = new PCB[30];
-		BlockingQueue readyQueue = new BlockingQueue();
-		BlockingQueue readQueue = new BlockingQueue();
-		BlockingQueue writeQueue = new BlockingQueue();
-		BlockingQueue blockQueue = new BlockingQueue();
+		BlockingQueue readyQueue = new BlockingQueue(false, "ready");
+		BlockingQueue readQueue = new BlockingQueue(false, "read");
+		BlockingQueue writeQueue = new BlockingQueue(false, "write");
+		BlockingQueue blockQueue = new BlockingQueue(false, "block");
 		long avgRunTime=0, avgReadyTime=0;
 		long totalRunTime, runStart, runEnd;
 		String input, output;

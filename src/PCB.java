@@ -58,6 +58,7 @@ public class PCB {
 		ret += " Output Buffer Size: " + outputBuffer;
 		ret += " Heap Size: " + tempBuffer;
 		ret += " Start Index: " + beginIndex;
+		ret += " Num Pages: " + numPages;
 		
 		return ret;
 		
