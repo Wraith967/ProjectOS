@@ -90,7 +90,7 @@ public class Execute {
 			pc.tempCache[address][offset] = inst.clone();
 			break;
 		case 3:
-			address = EffectiveAddress.DirectAddress(0,pc.registerBank[c[2]]);
+			address = EffectiveAddress.DirectAddress(0,pc.registerBank[c[3]]);
 			address -= (pc.p.codeSize + 32);
 			offset = address % 4;
 			address = address / 4;

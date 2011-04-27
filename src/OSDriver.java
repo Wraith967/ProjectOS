@@ -23,7 +23,8 @@ public class OSDriver {
 		PCB[] PCBarr = new PCB[30];
 		BlockingQueue readyQueue = new BlockingQueue();
 		BlockingQueue readQueue = new BlockingQueue();
-		BlockingQueue writeQueue = new BlockingQueue();	
+		BlockingQueue writeQueue = new BlockingQueue();
+		BlockingQueue blockQueue = new BlockingQueue();	
 		long avgRunTime=0, avgReadyTime=0;
 		long totalRunTime, runStart, runEnd;
 		String input, output;
@@ -36,7 +37,7 @@ public class OSDriver {
 		Loader control = new Loader(); // handles reading in and parsing of all instructions
 		MemoryManager mgr = new MemoryManager(); // handles RAM
 		PageHandler PH = new PageHandler(PTable, mgr, disk);
-		DMAChannel dm = new DMAChannel(readQueue, writeQueue, readyQueue, mgr, PH); // handles I/O requests
+		DMAChannel dm = new DMAChannel(readQueue, writeQueue, readyQueue, blockQueue, mgr, PH); // handles I/O requests
 		Scheduler sched = new Scheduler(mgr, disk, PCBarr, readyQueue); // moves job to CPU
 		CPU[] comp = new CPU[4]; // handles processing
 		for (int i=0; i<4; i++)

@@ -7,18 +7,19 @@ public class DMAChannel implements Runnable{
 
 	Thread t;
 	int address, offset;
-	BlockingQueue read, write, rdy;
+	BlockingQueue read, write, rdy, block;
 	int power, sum;
 	char[] inst;
 	MemoryManager mgr;
 	PageHandler PH;
 	
-	public DMAChannel(BlockingQueue r, BlockingQueue w, BlockingQueue rdy, MemoryManager m, PageHandler p)
+	public DMAChannel(BlockingQueue r, BlockingQueue w, BlockingQueue rdy, BlockingQueue b, MemoryManager m, PageHandler p)
 	{
 		address = 0;
 		read = r;
 		write = w;
 		this.rdy = rdy;
+		block = b;
 		mgr = m;
 		PH = p;
 	}
