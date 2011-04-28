@@ -1,7 +1,7 @@
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
-//import java.util.Scanner;
+import java.util.Scanner;
 
 /**
  * @author Ben
@@ -28,7 +28,7 @@ public class OSDriver {
 		long avgRunTime=0, avgReadyTime=0;
 		long totalRunTime, runStart, runEnd;
 		String input="DataFile2.txt", output="output.txt";
-		//Scanner scan = new Scanner(System.in);
+		Scanner scan = new Scanner(System.in);
 		
 		for (int i=0; i<30; i++)
 			PCBarr[i] = new PCB(PTable);
