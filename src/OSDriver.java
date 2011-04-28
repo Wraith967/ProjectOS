@@ -1,7 +1,7 @@
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
-//import java.util.Scanner;
+import java.util.Scanner;
 
 /**
  * 
@@ -16,6 +16,7 @@ import java.io.IOException;
 
 public class OSDriver {
 
+	public static final int numCPUs = 4;
 	/**
 	 * @param args
 	 * @throws IOException 
@@ -29,7 +30,7 @@ public class OSDriver {
 		long avgRunTime=0, avgReadyTime=0;
 		long totalRunTime, runStart, runEnd;
 		String input="DataFile2.txt", output="output.txt";
-		//Scanner scan = new Scanner(System.in);
+		Scanner scan = new Scanner(System.in);
 		
 		for (int i=0; i<30; i++)
 			PCBarr[i] = new PCB();
@@ -39,8 +40,8 @@ public class OSDriver {
 		MemoryManager mgr = new MemoryManager(); // handles RAM
 		DMAChannel dm = new DMAChannel(); // handles I/O requests
 		Scheduler sched = new Scheduler(mgr, disk, PCBarr, readyQueue); // moves job to CPU
-		CPU[] comp = new CPU[4]; // handles processing
-		for (int i=0; i<4; i++)
+		CPU[] comp = new CPU[numCPUs]; // handles processing
+		for (int i=0; i<numCPUs; i++)
 			comp[i] = new CPU(mgr, dm);
 		Dispatcher disp = new Dispatcher(mgr, sched, comp, PCBarr, readyQueue); // moves job data to CPU
 		
@@ -65,7 +66,6 @@ public class OSDriver {
 			PCBarr[i].ComputeTime();
 			avgRunTime += PCBarr[i].runTime;
 			avgReadyTime += PCBarr[i].readyTime;
-			//System.out.println("Number of I/O for jobID: " + PCBarr[i].jobID + " = " + PCBarr[i].IOcount);
 		}
 		
 		avgRunTime /= 30;
@@ -82,12 +82,26 @@ public class OSDriver {
 	private static void CoreDump(PCB[] p, char[][] disk, String output) throws IOException
 	{
 		BufferedWriter outputStream = new BufferedWriter(new FileWriter(output));
+		int set = 0;
 		for (int i=0; i<30; i++)
-			for (int j=0; j<p[i].totalSize; j++)
+		{
+			outputStream.write("-------------- Instructions for job " + p[i].jobID + ", I/O Count = " + p[i].count);
+			outputStream.newLine();
+	
+			for (int j=0; j<p[i].codeSize; j++)
 			{
-				outputStream.write(disk[p[i].beginIndex+j]);
+				outputStream.write(disk[set++]);
 				outputStream.newLine();
 			}
+			outputStream.write("--------------- Data for job " + p[i].jobID);
+			outputStream.newLine();
+			for (int j=0; j<44; j++)
+			{
+				outputStream.write(disk[set++]);
+				outputStream.newLine();
+			}
+			outputStream.newLine();
+		}
 		outputStream.close();
 	}
 }

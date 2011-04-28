@@ -34,7 +34,7 @@ public class Dispatcher {
 	{
 		this.mgr = mgr;
 		this.sch = sch;
-		t = new Thread[4];
+		t = new Thread[OSDriver.numCPUs];
 		isDone = false;
 		readyIndex = 0;
 		CPUDone = false;
@@ -55,7 +55,7 @@ public class Dispatcher {
 		isDone = false;
 		readyIndex = 0;
 		CPUDone = false;
-		for (int i=0; i<4; i++)
+		for (int i=0; i<OSDriver.numCPUs; i++)
 		{
 			LoadData(c[i], p[rq[readyIndex++]-1], i);
 			j++;
@@ -82,9 +82,9 @@ public class Dispatcher {
 				}
 			}
 			i++;
-			i %= 4;
+			i %= OSDriver.numCPUs;
 		}
-		for (i=0; i<4; i++)
+		for (i=0; i<OSDriver.numCPUs; i++)
 		{
 			while (!CPUDone)
 			{

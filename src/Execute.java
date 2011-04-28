@@ -40,7 +40,7 @@ public class Execute {
 		{
 		case 0:
 			//System.out.println("RD" + " " + c[2] + " " + c[3] + " " + c[4]);
-			count++;
+			pc.p.count++;
 			sum = 0;
 			if (c[4] == 0)
 				inst = dm.Read(0, pc.p.registerBank[c[3]], pc);
@@ -59,7 +59,7 @@ public class Execute {
 			break;
 		case 1:
 			//System.out.println("WR" + " " + c[2] + " " + c[3] + " " + c[4]);
-			count++;
+			pc.p.count++;
 			hex = Integer.toHexString(pc.p.registerBank[c[2]]);
 			hex = hex.toUpperCase();
 			hexArr = hex.toCharArray();
@@ -80,7 +80,6 @@ public class Execute {
 			break;
 		case 2:
 			//System.out.println("ST" + " " + c[2] + " " + c[3] + " " + c[4]);
-			count++;
 			hex = Integer.toHexString(pc.p.registerBank[c[2]]);
 			hex = hex.toUpperCase();
 			hexArr = hex.toCharArray();
@@ -92,7 +91,6 @@ public class Execute {
 			break;
 		case 3:
 			//System.out.println("LW" + " " + c[2] + " " + c[3] + " " + c[4]);
-			count++;
 			sum = 0;
 			inst = pc.cache[EffectiveAddress.DirectAddress(c[4],pc.p.registerBank[c[2]])].clone();
 			for (i=0; i<8; i++)
