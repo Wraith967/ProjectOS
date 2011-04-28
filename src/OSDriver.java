@@ -21,13 +21,13 @@ public class OSDriver {
 		char[][][] disk = new char[512][4][8]; // holds all instructions as 8 chars
 		PageTable PTable = new PageTable();
 		PCB[] PCBarr = new PCB[30];
-		BlockingQueue readyQueue = new BlockingQueue();
-		BlockingQueue readQueue = new BlockingQueue();
-		BlockingQueue writeQueue = new BlockingQueue();
-		BlockingQueue blockQueue = new BlockingQueue();	
+		BlockingQueue readyQueue = new BlockingQueue(false, "ready");
+		BlockingQueue readQueue = new BlockingQueue(false, "read");
+		BlockingQueue writeQueue = new BlockingQueue(false, "write");
+		BlockingQueue blockQueue = new BlockingQueue(false, "block");
 		long avgRunTime=0, avgReadyTime=0;
 		long totalRunTime, runStart, runEnd;
-		String input="DataFile2.txt", output="output.txt";
+		String input, output;
 		Scanner scan = new Scanner(System.in);
 		
 		for (int i=0; i<30; i++)
@@ -84,15 +84,42 @@ public class OSDriver {
 	private static void CoreDump(PCB[] p, char[][][] disk, String output, int end) throws IOException
 	{
 		BufferedWriter outputStream = new BufferedWriter(new FileWriter(output));
-		for (int i=0; i<end; i++)
+		int page = 0, set = 0;
+		for (int i=0; i<30; i++)
 		{
-			for (int j=0; j<4; j++)
+			outputStream.write("-------------- Instructions for job " + p[i].jobID + ", I/O Count = " + p[i].count);
+			outputStream.newLine();
+			
+			for (int j=0; j<p[i].codeSize; j++)
 			{
-				outputStream.write(disk[i][j]);
+				outputStream.write(disk[page][set]);
 				outputStream.newLine();
+				set++;
+				if (set == 4)
+				{
+					set = 0;
+					page++;
+				}
+			}
+			if (p[i].codeSize%4 != 0)
+			{
+				set = 0;
+				page++;
+			}
+			outputStream.write("--------------- Data for job " + p[i].jobID);
+			outputStream.newLine();
+			for (int j=0; j<44; j++)
+			{
+				outputStream.write(disk[page][set]);
+				outputStream.newLine();
+				set++;
+				if (set == 4)
+				{
+					set = 0;
+					page++;
+				}
 			}
 			outputStream.newLine();
 		}
-		outputStream.close();
 	}
 }

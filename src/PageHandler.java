@@ -47,6 +47,7 @@ public class PageHandler {
 	
 	public synchronized boolean LoadInstPage(PCB p)
 	{
+		//Dispatcher.threadMessage("Number of pages remaining " + pT.numPagesRemain);
 		synchronized(pT){
 			if (pT.numPagesRemain > 0)
 			{

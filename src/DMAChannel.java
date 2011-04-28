@@ -27,6 +27,7 @@ public class DMAChannel implements Runnable{
 	public void Read() throws InterruptedException
 	{
 		PCB temp = read.pop();	
+		temp.count++;
 		sum = 0;
 		if (temp.pages[temp.ioFrame] != -1)
 		{
@@ -61,8 +62,13 @@ public class DMAChannel implements Runnable{
 	public void Write() throws InterruptedException
 	{
 		PCB temp = write.pop();
+		temp.count++;
 		if (temp.pages[temp.ioFrame] != -1)
 		{
+//			String msg = "";
+//			for (int i=0; i<8; i++)
+//				msg += temp.writeInst[i];
+//			Dispatcher.threadMessage("Writing " + msg + " for job " + temp.jobID);
 			char [][] tempF = mgr.ReadFrame(temp.pages[temp.ioFrame]).clone();
 			tempF[temp.ioOffset] = temp.writeInst.clone();
 			mgr.WriteFrame(temp.pages[temp.ioFrame], tempF.clone());

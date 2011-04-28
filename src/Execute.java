@@ -34,7 +34,6 @@ public class Execute {
 		switch (c[1])
 		{
 		case 0:
-			pc.p.count++;
 			//Dispatcher.threadMessage("Current value of register " + c[3] + " = " + pc.registerBank[c[3]]);
 			if (c[4]==0)
 				address = EffectiveAddress.DirectAddress(0,pc.registerBank[c[3]]);
@@ -52,7 +51,6 @@ public class Execute {
 			pc.t.interrupt();
 			break;
 		case 1:
-			pc.p.count++;
 			hex = Integer.toHexString(pc.registerBank[c[2]]);
 			hex = hex.toUpperCase();
 			hexArr = hex.toCharArray();
@@ -90,11 +88,20 @@ public class Execute {
 			pc.tempCache[address][offset] = inst.clone();
 			break;
 		case 3:
-			address = EffectiveAddress.DirectAddress(0,pc.registerBank[c[3]]);
+			address = EffectiveAddress.DirectAddress(0,pc.registerBank[c[2]]);
+			//Dispatcher.threadMessage("Address = " + address);
 			address -= (pc.p.codeSize + 32);
 			offset = address % 4;
 			address = address / 4;
+			try {
 			inst = pc.tempCache[address][offset].clone();
+			} catch (ArrayIndexOutOfBoundsException e)
+			{
+				Dispatcher.threadMessage("Indexing failure, breaking job");
+				pc.p.running = false;
+				pc.p.finished = true;
+				break;
+			}
 			sum = 0;
 			for (i=0; i<8; i++)
 			{

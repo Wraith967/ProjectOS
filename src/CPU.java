@@ -43,6 +43,7 @@ public class CPU implements Runnable{
 	{
 		p.runStart = System.nanoTime();
 		p.running = true;
+		//Dispatcher.threadMessage("CPU " + cpuID + " running job " + p.jobID);
 		while (true)
 		{
 			if (p.finished)
